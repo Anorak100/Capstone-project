@@ -1,0 +1,26 @@
+# Auto-detect text files and perform line ending normalization
+* text=auto
+
+# Force shell scripts and configuration files to use LF (Unix/Mac/Linux standard)
+*.js text eol=lf
+*.ts text eol=lf
+*.jsx text eol=lf
+*.tsx text eol=lf
+*.json text eol=lf
+*.css text eol=lf
+*.md text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+
+# Force Windows-specific batch scripts to use CRLF
+*.cmd text eol=crlf
+*.bat text eol=crlf
+
+# Explicitly declare binary files that should never be touched or normalized
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.zip binary
