@@ -1,11 +1,28 @@
 {
+  "name": "fhast-pay-backend",
+  "version": "1.0.0",
+  "description": "Fhast Pay Backend API",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:push": "prisma db push",
+    "prisma:studio": "prisma studio"
+  },
   "dependencies": {
+    "@prisma/adapter-pg": "^7.10.0",
     "@prisma/client": "^7.10.0",
+    "@prisma/config": "^7.10.0",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
     "dotenv": "^18.0.3",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
+    "pg": "^8.23.0",
+    "prisma": "^7.10.0",
     "zod": "^4.6.5"
   },
   "devDependencies": {
