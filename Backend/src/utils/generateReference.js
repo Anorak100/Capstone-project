@@ -6,4 +6,4 @@ const generateReference = () => {
   return `TXN-${timestamp}-${random}`;
 };
 
-module.exports = generateReference;
+export default generateReference;

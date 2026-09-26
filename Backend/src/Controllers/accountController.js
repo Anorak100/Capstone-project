@@ -1,10 +1,10 @@
-const {
+import {
   createAccount,
   getUserAccounts,
   getAccountByNumber
-} = require("../services/accountService");
+} from "../services/accountService.js";
 
-const create = async (req, res, next) => {
+export const create = async (req, res, next) => {
   try {
     const account = await createAccount(
       req.user.userId,
@@ -23,7 +23,7 @@ const create = async (req, res, next) => {
   }
 };
 
-const getMyAccounts = async (req, res, next) => {
+export const getMyAccounts = async (req, res, next) => {
   try {
     const accounts = await getUserAccounts(req.user.userId);
 
@@ -39,7 +39,7 @@ const getMyAccounts = async (req, res, next) => {
   }
 };
 
-const getAccount = async (req, res, next) => {
+export const getAccount = async (req, res, next) => {
   try {
     const account = await getAccountByNumber(
       req.params.accountNumber,
@@ -58,7 +58,7 @@ const getAccount = async (req, res, next) => {
   }
 };
 
-const getBalance = async (req, res, next) => {
+export const getBalance = async (req, res, next) => {
   try {
     const account = await getAccountByNumber(
       req.params.accountNumber,
@@ -79,7 +79,7 @@ const getBalance = async (req, res, next) => {
   }
 };
 
-module.exports = {
+export default {
   create,
   getMyAccounts,
   getAccount,

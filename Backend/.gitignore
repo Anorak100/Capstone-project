@@ -39,3 +39,4 @@ ehthumbs.db
 # Testing & Coverage
 coverage/
 .nyc_output/
+/src/generated/prisma
