@@ -8,6 +8,7 @@ app.use(express.json({ limit: "10kb" }));
 app.use("/api/v1/auth", authRoute);
 app.use(errorMiddleware);
 import cors from "cors";
+import authRoute from "./Routes/authRoute.js";
 
 const app = express();
 
@@ -15,7 +16,7 @@ app.use(
   cors({
     origin: true,
     credentials: true,
-  })
+  }),
 );
 
 app.use(express.json());
@@ -35,4 +36,5 @@ app.get("/api/v1/status", (_req, res) => {
   });
 });
 
+app.use("/api/v1/auth", authRoute);
 export default app;

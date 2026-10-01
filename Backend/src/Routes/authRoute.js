@@ -1,7 +1,12 @@
+import express from "express";
+import { register, login } from "../Controllers/authController.js";
+import validate from "../Middleware/validationMiddleware.js";
+import { registerSchema, loginSchema } from "../validations/authValidation.js";
+
+const router = express.Router();
 import { Router } from "express";
 import { z } from "zod";
-import { login, register } from "../Controllers/authController.js";
-import validate from "../Middleware/validationMiddleware.js";
+
 
 const router = Router();
 
