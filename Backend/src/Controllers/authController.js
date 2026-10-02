@@ -7,7 +7,7 @@ import {
 
 export const register = async (req, res, next) => {
   try {
-    const user = await registerUser(req.body);
+    const result = await registerUser(req.body);
 
     res.status(201).json({
       success: true,
@@ -28,6 +28,20 @@ export const resendVerification = async (req, res, next) => {
     res.status(200).json({
       success: true,
       message: "If the account is pending, a new verification code has been sent",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const verifyOtp = async (req, res, next) => {
+  try {
+    const result = await verifyRegistrationOtp(req.body);
+
+    res.status(200).json({
+      success: true,
+      message: "Account verification successful",
+      data: result
     });
   } catch (error) {
     next(error);
@@ -67,4 +81,7 @@ export default {
   login,
   resendVerification,
   verifyRegistration,
+};
+  verifyOtp,
+  login
 };
