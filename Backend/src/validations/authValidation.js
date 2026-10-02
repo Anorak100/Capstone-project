@@ -37,3 +37,18 @@ export const loginSchema = z.object({
 
   password: z.string().min(1, "Password is required"),
 });
+
+export const verificationSchema = z.object({
+  identifier: z
+    .string()
+    .trim()
+    .min(1, "Email or phone number is required")
+    .transform((identifier) =>
+      identifier.includes("@") ? identifier.toLowerCase() : identifier,
+    ),
+  code: z.string().trim().min(1, "Verification code is required").max(20),
+});
+
+export const resendVerificationSchema = z.object({
+  email: z.string().trim().email("Please provide a valid email address").toLowerCase(),
+});

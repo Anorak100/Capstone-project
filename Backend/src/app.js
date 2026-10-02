@@ -1,14 +1,7 @@
 import express from "express";
-import authRoute from "./Routes/authRoute.js";
-import errorMiddleware from "./Middleware/errorMiddleware.js";
-
-const app = express();
-
-app.use(express.json({ limit: "10kb" }));
-app.use("/api/v1/auth", authRoute);
-app.use(errorMiddleware);
 import cors from "cors";
 import authRoute from "./Routes/authRoute.js";
+import errorMiddleware from "./Middleware/errorMiddleware.js";
 
 const app = express();
 
@@ -19,7 +12,7 @@ app.use(
   }),
 );
 
-app.use(express.json());
+app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: true }));
 
 app.get("/health", (_req, res) => {
@@ -37,4 +30,6 @@ app.get("/api/v1/status", (_req, res) => {
 });
 
 app.use("/api/v1/auth", authRoute);
+app.use(errorMiddleware);
+
 export default app;

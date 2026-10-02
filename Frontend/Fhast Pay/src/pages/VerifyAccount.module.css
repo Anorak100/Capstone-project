@@ -97,6 +97,13 @@
   border-color: var(--color-primary);
 }
 
+.formGroup .emailInput {
+  text-align: left;
+  letter-spacing: normal;
+  font-size: 0.95rem;
+  font-weight: 400;
+}
+
 .verifyButton {
   width: 100%;
   min-height: 48px;
@@ -119,6 +126,57 @@
   border-color: var(--color-primary-dark);
   box-shadow: var(--shadow-md);
   transform: translateY(-1px);
+}
+
+.verifyButton:disabled,
+.resendButton:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.errorMessage,
+.noticeMessage {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.errorMessage {
+  color: #b42318;
+}
+
+.noticeMessage {
+  color: var(--color-text-muted);
+}
+
+.accountSummary {
+  margin-top: var(--space-8);
+  text-align: center;
+}
+
+.accountSummary h2 {
+  margin: 0 0 var(--space-5);
+  color: var(--color-text);
+  font-size: 1.25rem;
+}
+
+.accountSummary p {
+  margin: var(--space-2) 0;
+  color: var(--color-text-muted);
+}
+
+.accountSummary strong {
+  display: block;
+  font-size: 1.4rem;
+  overflow-wrap: anywhere;
+}
+
+.accountSummary .verifyButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: var(--space-6);
+  text-decoration: none;
 }
 
 .resend {
