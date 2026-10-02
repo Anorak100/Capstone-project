@@ -1,9 +1,14 @@
-const errorMiddleware = (error, _req, res, _next) => {
-	const statusCode = error.statusCode ?? 500;
+const errorMiddleware = (error, req, res, next) => {
+	if (res.headersSent) {
+		return next(error);
+	}
+
+	const statusCode = error.statusCode || (error.type === "entity.parse.failed" ? 400 : 500);
+	const message = statusCode === 500 ? "Internal server error" : error.message;
 
 	res.status(statusCode).json({
 		success: false,
-		message: statusCode === 500 ? "An unexpected error occurred" : error.message
+		message
 	});
 };
 
