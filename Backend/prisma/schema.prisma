@@ -46,9 +46,10 @@ model User {
   fullName             String?
   email                String            @unique
   phone                String            @unique
+  bvn                  String?           @unique @db.VarChar(11)
   password             String
   role                 Role              @default(CUSTOMER)
-  isActive             Boolean           @default(true)
+  isActive             Boolean           @default(false)
   createdAt            DateTime          @default(now())
   updatedAt            DateTime          @updatedAt
   accounts             Account[]
