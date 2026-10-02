@@ -11,6 +11,9 @@ node_modules/
 .env.production.local
 *.pem
 
+# Local planning notes; do not publish
+/docs/implementation-roadmap.md
+
 # Build & production outputs
 dist/
 build/
@@ -40,5 +43,3 @@ ehthumbs.db
 coverage/
 .nyc_output/
 /src/generated/prisma
-/src/generated/sqlite
-/prisma/dev.db
