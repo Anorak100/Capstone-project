@@ -1,6 +1,6 @@
 import {
-  registerUser,
   loginUser,
+  registerUser,
   resendRegistrationOtp,
   verifyRegistrationOtp,
 } from "../services/authService.js";
@@ -8,13 +8,12 @@ import {
 export const register = async (req, res, next) => {
   try {
     const result = await registerUser(req.body);
-
     res.status(201).json({
       success: true,
-      message: user.verificationEmailSent
+      message: result.verificationEmailSent
         ? "Verification code sent"
         : "Registration saved, but the verification email could not be sent. Request a new code to continue.",
-      data: user,
+      data: result,
     });
   } catch (error) {
     next(error);
@@ -24,7 +23,6 @@ export const register = async (req, res, next) => {
 export const resendVerification = async (req, res, next) => {
   try {
     await resendRegistrationOtp(req.body.email);
-
     res.status(200).json({
       success: true,
       message: "If the account is pending, a new verification code has been sent",
@@ -34,38 +32,9 @@ export const resendVerification = async (req, res, next) => {
   }
 };
 
-export const verifyOtp = async (req, res, next) => {
-  try {
-    const result = await verifyRegistrationOtp(req.body);
-
-    res.status(200).json({
-      success: true,
-      message: "Account verification successful",
-      data: result
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const login = async (req, res, next) => {
-  try {
-    const result = await loginUser(req.body);
-
-    res.status(200).json({
-      success: true,
-      message: "Login successful",
-      data: result
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
 export const verifyRegistration = async (req, res, next) => {
   try {
     const result = await verifyRegistrationOtp(req.body);
-
     res.status(200).json({
       success: true,
       message: "Account verified successfully",
@@ -76,12 +45,15 @@ export const verifyRegistration = async (req, res, next) => {
   }
 };
 
-export default {
-  register,
-  login,
-  resendVerification,
-  verifyRegistration,
-};
-  verifyOtp,
-  login
+export const login = async (req, res, next) => {
+  try {
+    const result = await loginUser(req.body);
+    res.status(200).json({
+      success: true,
+      message: "Login successful",
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
