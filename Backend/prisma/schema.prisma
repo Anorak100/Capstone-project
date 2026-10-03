@@ -34,6 +34,11 @@ enum TransactionStatus {
   PENDING
 }
 
+enum TransactionDirection {
+  DEBIT
+  CREDIT
+}
+
 model User {
   id                   String            @id @default(uuid())
   firstName            String?
@@ -77,6 +82,8 @@ model Transaction {
   reference     String            @unique
   amount        Decimal           @db.Decimal(15, 2)
   type          TransactionType
+  direction     TransactionDirection?
+  transferReference String?
   status        TransactionStatus @default(SUCCESSFUL)
   description   String?
 
@@ -97,6 +104,7 @@ model Transaction {
   @@index([toAccountId])
   @@index([senderId])
   @@index([recipientId])
+  @@index([transferReference])
   @@map("transactions")
 }
 

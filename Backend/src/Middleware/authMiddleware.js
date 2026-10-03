@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 
-const authenticate = (req, res, next) => {
+const authMiddleware = (req, res, next) => {
   const [scheme, token] = req.headers.authorization?.split(" ") ?? [];
   if (scheme !== "Bearer" || !token) {
     return res.status(401).json({
@@ -10,8 +10,11 @@ const authenticate = (req, res, next) => {
   }
 
   try {
-    const payload = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = { userId: payload.sub ?? payload.id, role: payload.role };
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = {
+      ...decoded,
+      userId: decoded.userId ?? decoded.id ?? decoded.sub,
+    };
     next();
   } catch {
     res.status(401).json({
@@ -21,4 +24,4 @@ const authenticate = (req, res, next) => {
   }
 };
 
-export default authenticate;
+export default authMiddleware;
