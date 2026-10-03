@@ -34,11 +34,6 @@ enum TransactionStatus {
   PENDING
 }
 
-enum VerificationType {
-  REGISTRATION
-  PASSWORD_RESET
-}
-
 model User {
   id                   String            @id @default(uuid())
   firstName            String?
@@ -46,10 +41,9 @@ model User {
   fullName             String?
   email                String            @unique
   phone                String            @unique
-  bvn                  String?           @unique @db.VarChar(11)
   password             String
   role                 Role              @default(CUSTOMER)
-  isActive             Boolean           @default(false)
+  isActive             Boolean           @default(true)
   createdAt            DateTime          @default(now())
   updatedAt            DateTime          @updatedAt
   accounts             Account[]
@@ -106,14 +100,3 @@ model Transaction {
   @@map("transactions")
 }
 
-model VerificationCode {
-  id         String           @id @default(uuid())
-  identifier String
-  code       String
-  type       VerificationType
-  expiresAt  DateTime
-  createdAt  DateTime         @default(now())
-
-  @@index([identifier])
-  @@map("verification_codes")
-}

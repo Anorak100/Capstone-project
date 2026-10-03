@@ -31,9 +31,7 @@ function Register() {
     setIsSubmitting(true);
     try {
       const response = await registerUser(data);
-      navigate("/verify-account", {
-        state: { email: data.email, notice: response.message },
-      });
+      navigate("/login", { state: { notice: response.message } });
     } catch (requestError) {
       setError(
         requestError instanceof Error

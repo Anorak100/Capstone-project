@@ -1,6 +1,6 @@
 # Fhast Pay — Backend Blueprint & Guide
 
-> Complete architecture, database models, and service-oriented structure for Node.js, Express, and Prisma.
+> Architecture, database models, and service-oriented structure for Node.js, Express, and Prisma.
 
 ---
 
@@ -20,14 +20,13 @@ Fhast Pay implements a strict **Service-Oriented Architecture (SOA)** ensuring c
 
 ## 2. Database Schema Design (Prisma)
 
-The Neon PostgreSQL database schema models users, wallets, immutable ledgers, verification codes, and administrative roles:
+The PostgreSQL database schema models users, wallets, immutable ledgers, and administrative roles:
 
 | Model / Enum | Fields / Structure | Purpose |
 | :--- | :--- | :--- |
 | **`User`** | `id`, `firstName`, `lastName`, `email`, `phone`, `password`, `role` (`CUSTOMER` / `ADMIN`) | Stores core user profile credentials and access permission levels. |
 | **`Account`** | `id`, `userId`, `accountNumber` (phone-based), `balance` (`Decimal`), `currency` | Manages user wallet balances and multi-currency support (default: `NGN`). |
 | **`Transaction`** | `id`, `reference`, `senderId`, `recipientId`, `amount`, `type`, `status` | Immutable double-entry audit ledger tracking transfers and deposits. |
-| **`VerificationCode`** | `id`, `identifier`, `code`, `type` (`REGISTRATION` / `PASSWORD_RESET`), `expiresAt` | Handles OTP verification tokens for authentication and recovery flows. |
 
 ---
 
@@ -37,8 +36,8 @@ Customer-facing routes secured via JWT authentication:
 
 | Module | Method | Endpoint Path | Description |
 | :--- | :---: | :--- | :--- |
-| **Auth** | `POST` | `/api/auth/register` | Register user profile, hash password, and dispatch OTP. |
-| **Auth** | `POST` | `/api/auth/login` | Authenticate credentials and issue secure JWT access token. |
+| **Auth** | `POST` | `/api/v1/auth/register` | Register user, hash password, and create an account. |
+| **Auth** | `POST` | `/api/v1/auth/login` | Authenticate phone number and password; issue a JWT. |
 | **Accounts** | `GET` | `/api/accounts/balance` | Fetch authenticated user's wallet balance and currency. |
 | **Accounts** | `POST` | `/api/accounts/lookup` | Name enquiry verification of recipient phone number. |
 | **Transactions** | `POST` | `/api/transactions/transfer` | Execute atomic peer-to-peer fund transfer across accounts. |
@@ -83,7 +82,7 @@ A phased rollout ensures stability before complexity is layered in:
 
 1. **Phase 1: Core User & Auth Engine**
    - Provision Neon PostgreSQL with Prisma schema migrations.
-   - Implement registration, password hashing, OTP verification, and JWT authentication.
+   - Implement registration, password hashing, and phone/password JWT authentication.
 2. **Phase 2: Accounts & Atomic Transactions**
    - Implement phone-based account number generation.
    - Build ACID-compliant double-entry transfer service with balance locks.

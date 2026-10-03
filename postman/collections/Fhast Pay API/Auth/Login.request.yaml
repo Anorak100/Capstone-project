@@ -9,7 +9,7 @@ body:
   type: json
   content: |-
     {
-      "email": "john.doe@example.com",
+      "phone": "+2341234567890",
       "password": "MyPass@1234"
     }
 scripts:
@@ -26,7 +26,7 @@ scripts:
       });
 
       const json = pm.response.json();
-      if (json.success && json.data && json.data.accessToken) {
-        pm.collectionVariables.set("accessToken", json.data.accessToken);
+      if (json.success && json.data && json.data.token) {
+        pm.collectionVariables.set("accessToken", json.data.token);
         console.log("Access token saved to collection variable.");
       }

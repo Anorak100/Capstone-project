@@ -1,34 +1,54 @@
+import { useState } from "react";
+import type { FormEvent } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { loginUser } from "../services/authService";
 import styles from "./Login.module.css";
-import { useNavigate } from "react-router-dom";
+
 function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const notice = (location.state as { notice?: string } | null)?.notice;
+  const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setError("");
+    setIsSubmitting(true);
+
+    const formData = new FormData(event.currentTarget);
+    try {
+      const response = await loginUser({
+        phone: String(formData.get("phone") ?? "").trim(),
+        password: String(formData.get("password") ?? ""),
+      });
+      localStorage.setItem("authToken", response.data.token);
+      navigate("/dashboard");
+    } catch (requestError) {
+      setError(requestError instanceof Error ? requestError.message : "Unable to sign in");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <main className={styles.login}>
       <div className={styles.card}>
         <div className={styles.header}>
           <span className={styles.badge}>FHAST PAY</span>
-
           <h1>Welcome back</h1>
-
-          <p>Sign in to your account to continue banking.</p>
+          <p>Sign in with your phone number and password.</p>
         </div>
 
-        <form
-          className={styles.form}
-          onSubmit={(event) => {
-            event.preventDefault();
-            navigate("/dashboard");
-          }}
-        >
+        <form className={styles.form} onSubmit={handleSubmit}>
           <div className={styles.formGroup}>
-            <label htmlFor="email">Email address</label>
-
+            <label htmlFor="phone">Phone number</label>
             <input
-              id="email"
-              type="email"
-              name="email"
-              placeholder="Enter your email"
-              autoComplete="email"
+              id="phone"
+              type="tel"
+              name="phone"
+              placeholder="Enter your phone number"
+              autoComplete="tel"
               required
             />
           </div>
@@ -36,10 +56,7 @@ function Login() {
           <div className={styles.formGroup}>
             <div className={styles.passwordHeader}>
               <label htmlFor="password">Password</label>
-
-              <a href="/forgot-password">Forgot password?</a>
             </div>
-
             <input
               id="password"
               type="password"
@@ -50,13 +67,16 @@ function Login() {
             />
           </div>
 
-          <button type="submit" className={styles.loginButton}>
-            Sign In
+          {notice && <p className={styles.noticeMessage} role="status">{notice}</p>}
+          {error && <p className={styles.errorMessage} role="alert">{error}</p>}
+
+          <button type="submit" className={styles.loginButton} disabled={isSubmitting}>
+            {isSubmitting ? "Signing in..." : "Sign In"}
           </button>
         </form>
 
         <p className={styles.registerText}>
-          Don't have an account? <a href="/register">Create an account</a>
+          Don&apos;t have an account? <Link to="/register">Create an account</Link>
         </p>
       </div>
     </main>
