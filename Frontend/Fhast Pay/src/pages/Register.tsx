@@ -1,7 +1,48 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import type { FormEvent } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { registerUser } from "../services/authService";
 import styles from "./Register.module.css";
 
 function Register() {
+  const navigate = useNavigate();
+  const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setError("");
+
+    const formData = new FormData(event.currentTarget);
+    const password = String(formData.get("password") ?? "");
+    if (password !== String(formData.get("confirmPassword") ?? "")) {
+      setError("Passwords do not match");
+      return;
+    }
+
+    const data = {
+      firstName: String(formData.get("firstName") ?? "").trim(),
+      lastName: String(formData.get("lastName") ?? "").trim(),
+      email: String(formData.get("email") ?? "").trim(),
+      phone: String(formData.get("phone") ?? "").trim(),
+      password,
+    };
+
+    setIsSubmitting(true);
+    try {
+      const response = await registerUser(data);
+      navigate("/login", { state: { notice: response.message } });
+    } catch (requestError) {
+      setError(
+        requestError instanceof Error
+          ? requestError.message
+          : "Unable to create your account",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <main className={styles.register}>
       <div className={styles.card}>
@@ -16,7 +57,7 @@ function Register() {
           </p>
         </div>
 
-        <form className={styles.form}>
+        <form className={styles.form} onSubmit={handleSubmit}>
           <div className={styles.nameRow}>
             <div className={styles.formGroup}>
               <label htmlFor="firstName">First name</label>
@@ -97,8 +138,14 @@ function Register() {
             />
           </div>
 
-          <button type="submit" className={styles.registerButton}>
-            Create Account
+          {error && <p className={styles.errorMessage} role="alert">{error}</p>}
+
+          <button
+            type="submit"
+            className={styles.registerButton}
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "Creating account..." : "Create Account"}
           </button>
         </form>
 

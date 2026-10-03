@@ -1,0 +1,32 @@
+$kind: http-request
+method: POST
+url: '{{baseUrl}}/api/v1/auth/login'
+order: 2000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "phone": "+2341234567890",
+      "password": "MyPass@1234"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status code is 200", function () {
+        pm.response.to.have.status(200);
+      });
+
+      pm.test("Response success is true", function () {
+        const json = pm.response.json();
+        pm.expect(json.success).to.eql(true);
+      });
+
+      const json = pm.response.json();
+      if (json.success && json.data && json.data.token) {
+        pm.collectionVariables.set("accessToken", json.data.token);
+        console.log("Access token saved to collection variable.");
+      }

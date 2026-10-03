@@ -21,7 +21,7 @@ const parseAmount = (amount) => {
 
   return {
     cents,
-    decimal: `${whole}.${fraction.padEnd(2, "0")}`
+    decimal: `${cents / 100n}.${String(cents % 100n).padStart(2, "0")}`,
   };
 };
 
@@ -157,8 +157,16 @@ export const getUserTransactions = async ({
 
   const safePage = Number.isInteger(page) && page > 0 ? page : 1;
   const safeLimit = Number.isInteger(limit) && limit > 0 ? Math.min(limit, 100) : 10;
-  const normalizedType = type?.toUpperCase();
-  const normalizedStatus = status?.toUpperCase();
+  const normalizeFilter = (value, name) => {
+    if (value === undefined || value === "") return undefined;
+    if (typeof value !== "string") {
+      throw createHttpError(`Transaction ${name} is invalid`, 400);
+    }
+    return value.trim().toUpperCase();
+  };
+
+  const normalizedType = normalizeFilter(type, "type");
+  const normalizedStatus = normalizeFilter(status, "status");
   if (normalizedType && !["DEPOSIT", "WITHDRAWAL", "TRANSFER"].includes(normalizedType)) {
     throw createHttpError("Transaction type is invalid", 400);
   }

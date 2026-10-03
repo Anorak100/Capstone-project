@@ -11,6 +11,9 @@ node_modules/
 .env.production.local
 *.pem
 
+# Local planning notes; do not publish
+/docs/implementation-roadmap.md
+
 # Build & production outputs
 dist/
 build/
