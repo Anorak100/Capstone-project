@@ -108,6 +108,18 @@
   border-color: var(--color-primary);
 }
 
+.errorMessage {
+  margin: 0;
+  color: #b42318;
+  font-size: 0.9rem;
+}
+
+.noticeMessage {
+  margin: 0;
+  color: var(--color-primary);
+  font-size: 0.9rem;
+}
+
 .loginButton {
   width: 100%;
   min-height: 48px;

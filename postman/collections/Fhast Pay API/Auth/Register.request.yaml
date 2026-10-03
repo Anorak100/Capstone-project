@@ -34,7 +34,8 @@ scripts:
           pm.expect(jsonData.data.user).to.have.property("email");
       });
 
-      pm.test("Onboarding status is OTP_VERIFICATION_REQUIRED", function () {
+        pm.test("Registration creates an account", function () {
           var jsonData = pm.response.json();
-          pm.expect(jsonData.data.onboarding.status).to.eql("OTP_VERIFICATION_REQUIRED");
+          pm.expect(jsonData.data).to.have.property("account");
+          pm.expect(jsonData.data.account).to.have.property("accountNumber");
       });

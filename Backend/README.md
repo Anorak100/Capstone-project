@@ -10,10 +10,7 @@ This directory contains the API for the Fhast Pay capstone project. PostgreSQL i
 4. Apply migrations with `npx prisma migrate deploy`.
 5. Start the API with `npm run dev`.
 
-## Signup verification
+## Authentication
 
-- `POST /api/v1/auth/register` creates a pending user, stores a six-digit code, and emails it.
-- `POST /api/v1/auth/verify` accepts `{ "identifier": "email", "code": "123456" }`. A valid code activates the user and creates their account.
-- `POST /api/v1/auth/resend-verification` accepts `{ "email": "user@example.com" }` and replaces the pending code.
-
-Codes expire after `OTP_TTL_MINUTES` (10 minutes by default). SMTP credentials belong in local environment settings and must not be committed.
+- `POST /api/v1/auth/register` creates an active user and bank account.
+- `POST /api/v1/auth/login` accepts a phone number and password, then returns a JWT.
