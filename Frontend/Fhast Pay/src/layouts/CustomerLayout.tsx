@@ -1,4 +1,10 @@
+import { useEffect } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import {
+  getAuthToken,
+  getStoredUser,
+  isAdminUser,
+} from "../utils/authSession";
 import {
   FiHome,
   FiSend,
@@ -12,8 +18,20 @@ import styles from "./CustomerLayout.module.css";
 function CustomerLayout() {
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const token = getAuthToken();
+    if (!token) {
+      navigate("/login", { replace: true });
+      return;
+    }
+    if (isAdminUser(getStoredUser())) {
+      navigate("/admin", { replace: true });
+    }
+  }, [navigate]);
+
   const handleLogout = () => {
     localStorage.removeItem("authToken");
+    localStorage.removeItem("user");
     navigate("/login");
   };
 

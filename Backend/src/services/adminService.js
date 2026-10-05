@@ -56,6 +56,7 @@ export const listUsers = async ({ page, limit, search }) => {
           { fullName: { contains: normalizedSearch, mode: "insensitive" } },
           { email: { contains: normalizedSearch, mode: "insensitive" } },
           { phone: { contains: normalizedSearch } },
+          { accounts: { some: { accountNumber: { contains: normalizedSearch } } } },
         ],
       }
     : {};
@@ -147,19 +148,29 @@ export const updateUserStatus = async ({ userId, isActive, adminId }) => {
   }, { isolationLevel: "Serializable" });
 };
 
-const buildTransactionWhere = ({ type, status, userId, reference, from, to }) => ({
-  ...(type ? { type } : {}),
-  ...(status ? { status } : {}),
-  ...((from || to)
-    ? { createdAt: { ...(from ? { gte: from } : {}), ...(to ? { lte: to } : {}) } }
-    : {}),
-  AND: [
-    ...(userId ? [{ OR: [{ senderId: userId }, { recipientId: userId }] }] : []),
-    ...(reference
-      ? [{ OR: [{ reference: { contains: reference } }, { transferReference: { contains: reference } }] }]
-      : []),
-  ],
-});
+const buildTransactionWhere = ({ type, status, userId, reference, search, from, to }) => {
+  const normalizedSearch = search?.trim() || reference?.trim();
+  return {
+    ...(type ? { type } : {}),
+    ...(status ? { status } : {}),
+    ...((from || to)
+      ? { createdAt: { ...(from ? { gte: from } : {}), ...(to ? { lte: to } : {}) } }
+      : {}),
+    AND: [
+      ...(userId ? [{ OR: [{ senderId: userId }, { recipientId: userId }] }] : []),
+      ...(normalizedSearch
+        ? [{
+            OR: [
+              { reference: { contains: normalizedSearch, mode: "insensitive" } },
+              { transferReference: { contains: normalizedSearch, mode: "insensitive" } },
+              { sender: { fullName: { contains: normalizedSearch, mode: "insensitive" } } },
+              { recipient: { fullName: { contains: normalizedSearch, mode: "insensitive" } } },
+            ],
+          }]
+        : []),
+    ],
+  };
+};
 
 export const listTransactions = async (filters) => {
   const pagination = getPagination(filters.page, filters.limit);
@@ -193,12 +204,37 @@ export const getTransactionByReference = async (reference) => {
 };
 
 export const getMetrics = async () => {
-  const [totalUsers, activeUsers, totalAccounts, activeAccounts, currencies] = await Promise.all([
+  const startOfToday = new Date();
+  startOfToday.setHours(0, 0, 0, 0);
+
+  const [
+    totalUsers,
+    activeUsers,
+    totalAccounts,
+    activeAccounts,
+    currencies,
+    totalTransactions,
+    totalSuccessfulDebitVolume,
+    todaySuccessfulDebitVolume,
+  ] = await Promise.all([
     prisma.user.count(),
     prisma.user.count({ where: { isActive: true } }),
     prisma.account.count(),
     prisma.account.count({ where: { status: "ACTIVE" } }),
     prisma.account.findMany({ distinct: ["currency"], select: { currency: true } }),
+    prisma.transaction.count(),
+    prisma.transaction.aggregate({
+      where: { status: "SUCCESSFUL", direction: "DEBIT" },
+      _sum: { amount: true },
+    }),
+    prisma.transaction.aggregate({
+      where: {
+        status: "SUCCESSFUL",
+        direction: "DEBIT",
+        createdAt: { gte: startOfToday },
+      },
+      _sum: { amount: true },
+    }),
   ]);
 
   const transferTotals = await Promise.all(currencies.map(async ({ currency }) => {
@@ -223,6 +259,11 @@ export const getMetrics = async () => {
     users: { total: totalUsers, active: activeUsers },
     accounts: { total: totalAccounts, active: activeAccounts },
     transfers: transferTotals,
+    transactions: { total: totalTransactions },
+    volume: {
+      processed: totalSuccessfulDebitVolume._sum.amount ?? "0.00",
+      today: todaySuccessfulDebitVolume._sum.amount ?? "0.00",
+    },
   };
 };
 

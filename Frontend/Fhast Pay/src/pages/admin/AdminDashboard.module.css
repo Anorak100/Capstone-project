@@ -113,16 +113,16 @@
   color: #d97706;
 }
 
-.trendPill {
+.metaPill {
   display: inline-flex;
   align-items: center;
   gap: 3px;
   padding: 2px 8px;
-  background: #f0fdf4;
-  color: #16a34a;
+  background: #f1f5f9;
+  color: #475569;
   border-radius: var(--radius-full);
   font-size: 0.75rem;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .metricContent {
@@ -168,6 +168,111 @@
   border-radius: var(--radius-xl);
   padding: var(--space-8);
   box-shadow: var(--shadow-sm);
+}
+
+.loadingState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-12);
+  color: var(--color-text-muted);
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.errorBanner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-6);
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+  border-radius: var(--radius-lg);
+  font-size: 0.875rem;
+}
+
+.activityList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.activityItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: #fbfdff;
+}
+
+.activityIconWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.activityDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.activityDetails strong {
+  font-size: 0.9rem;
+  color: var(--color-text);
+}
+
+.activityDetails span {
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.activityMeta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.activityMeta strong {
+  font-size: 0.9rem;
+  color: var(--color-text);
+}
+
+.activityMeta span {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
 }
 
 @media (max-width: 1024px) {

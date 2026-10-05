@@ -1,8 +1,15 @@
 const adminMiddleware = (req, res, next) => {
-  if (req.user?.role !== "ADMIN") {
+  if (!req.user) {
+    return res.status(401).json({
+      success: false,
+      message: "Authentication is required",
+    });
+  }
+
+  if (req.user.role !== "ADMIN") {
     return res.status(403).json({
       success: false,
-      message: "Administrator access is required",
+      message: "Forbidden: administrator access is required",
     });
   }
 

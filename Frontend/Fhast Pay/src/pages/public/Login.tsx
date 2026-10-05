@@ -36,7 +36,9 @@ function Login() {
       if (response.data.user) {
         localStorage.setItem("user", JSON.stringify(response.data.user));
       }
-      navigate("/dashboard");
+      const destination =
+        response.data.user?.role === "ADMIN" ? "/admin" : "/dashboard";
+      navigate(destination, { replace: true });
     } catch (requestError) {
       setError(
         requestError instanceof Error

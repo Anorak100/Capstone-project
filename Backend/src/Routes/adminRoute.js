@@ -24,6 +24,16 @@ import {
 const router = Router();
 
 router.use(authMiddleware, adminMiddleware);
+
+/** Sample protected route — confirms admin JWT + role before other admin APIs */
+router.get("/status", (_req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "Admin access verified",
+    data: { scope: "admin" },
+  });
+});
+
 router.get("/users", validateRequest("query", adminUserListSchema), getUsers);
 router.get("/users/:userId", validateRequest("params", userIdParamsSchema), getUser);
 router.patch(

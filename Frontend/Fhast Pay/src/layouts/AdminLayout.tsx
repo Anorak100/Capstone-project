@@ -1,4 +1,10 @@
+import { useEffect } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import {
+  getAuthToken,
+  getStoredUser,
+  isAdminUser,
+} from "../utils/authSession";
 import {
   FiGrid,
   FiUsers,
@@ -12,8 +18,21 @@ import styles from "./AdminLayout.module.css";
 function AdminLayout() {
   const navigate = useNavigate();
 
-  const handleExit = () => {
-    navigate("/dashboard");
+  useEffect(() => {
+    const token = getAuthToken();
+    if (!token) {
+      navigate("/login", { replace: true });
+      return;
+    }
+    if (!isAdminUser(getStoredUser())) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [navigate]);
+
+  const handleLogout = () => {
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("user");
+    navigate("/login", { replace: true });
   };
 
   return (
@@ -76,11 +95,11 @@ function AdminLayout() {
           <button
             type="button"
             className={styles.exitButton}
-            onClick={handleExit}
-            title="Return to Customer App"
+            onClick={handleLogout}
+            title="Sign out of admin console"
           >
             <FiLogOut className={styles.navIcon} />
-            <span>Customer View</span>
+            <span>Sign Out</span>
           </button>
         </div>
       </aside>

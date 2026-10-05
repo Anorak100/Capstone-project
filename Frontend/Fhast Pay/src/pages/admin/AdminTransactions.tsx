@@ -1,61 +1,72 @@
-import { useState } from "react";
-import { FiSearch, FiArrowUpRight, FiArrowDownLeft } from "react-icons/fi";
+import { useEffect, useState } from "react";
+import {
+  FiSearch,
+  FiArrowUpRight,
+  FiArrowDownLeft,
+  FiRefreshCw,
+  FiAlertCircle,
+} from "react-icons/fi";
+import EmptyState from "../../components/common/EmptyState";
+import {
+  formatAdminDate,
+  formatAdminMoney,
+  getAdminTransactions,
+  getTransactionUserLabel,
+  type AdminTransaction,
+} from "../../services/adminService";
+import { getAuthToken } from "../../utils/authSession";
 import styles from "./AdminTransactions.module.css";
 
-const MOCK_ADMIN_TXS = [
-  {
-    id: "tx_1",
-    reference: "FP-TXN-849102",
-    user: "Samuel Godswill",
-    type: "TRANSFER",
-    amount: "₦25,000.00",
-    status: "SUCCESSFUL",
-    date: "Oct 5, 2026 · 14:32",
-    direction: "DEBIT",
-  },
-  {
-    id: "tx_2",
-    reference: "FP-TXN-849103",
-    user: "Mark Philip",
-    type: "DEPOSIT",
-    amount: "₦50,000.00",
-    status: "SUCCESSFUL",
-    date: "Oct 5, 2026 · 13:15",
-    direction: "CREDIT",
-  },
-  {
-    id: "tx_3",
-    reference: "FP-TXN-849104",
-    user: "Alice Peters",
-    type: "TRANSFER",
-    amount: "₦12,000.00",
-    status: "SUCCESSFUL",
-    date: "Oct 5, 2026 · 11:40",
-    direction: "DEBIT",
-  },
-  {
-    id: "tx_4",
-    reference: "FP-TXN-849105",
-    user: "Jane Joy",
-    type: "TRANSFER",
-    amount: "₦5,500.00",
-    status: "SUCCESSFUL",
-    date: "Oct 5, 2026 · 09:20",
-    direction: "CREDIT",
-  },
-];
+type FilterType = "ALL" | "TRANSFER" | "DEPOSIT";
 
 function AdminTransactions() {
   const [search, setSearch] = useState("");
-  const [filterType, setFilterType] = useState<"ALL" | "TRANSFER" | "DEPOSIT">("ALL");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [filterType, setFilterType] = useState<FilterType>("ALL");
+  const [transactions, setTransactions] = useState<AdminTransaction[]>([]);
+  const [total, setTotal] = useState(0);
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
 
-  const filtered = MOCK_ADMIN_TXS.filter((tx) => {
-    const matchesFilter = filterType === "ALL" ? true : tx.type === filterType;
-    const matchesSearch =
-      tx.reference.toLowerCase().includes(search.toLowerCase()) ||
-      tx.user.toLowerCase().includes(search.toLowerCase());
-    return matchesFilter && matchesSearch;
-  });
+  useEffect(() => {
+    const timer = window.setTimeout(() => setDebouncedSearch(search.trim()), 300);
+    return () => window.clearTimeout(timer);
+  }, [search]);
+
+  useEffect(() => {
+    const loadTransactions = async () => {
+      const token = getAuthToken();
+      if (!token) {
+        setError("You are not signed in.");
+        setIsLoading(false);
+        return;
+      }
+
+      setIsLoading(true);
+      setError("");
+
+      try {
+        const result = await getAdminTransactions(token, {
+          page: 1,
+          limit: 50,
+          type: filterType === "ALL" ? undefined : filterType,
+          search: debouncedSearch || undefined,
+        });
+        setTransactions(result.transactions);
+        setTotal(result.pagination.total);
+      } catch (requestError) {
+        setError(
+          requestError instanceof Error
+            ? requestError.message
+            : "Unable to load transactions",
+        );
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadTransactions();
+  }, [filterType, debouncedSearch]);
 
   return (
     <main className={styles.transactions}>
@@ -64,7 +75,10 @@ function AdminTransactions() {
           <div>
             <div className={styles.headerTag}>Global Ledger</div>
             <h1>All Transactions</h1>
-            <p>Real-time audit log of transfers, deposits, and account activities across Fhast Pay.</p>
+            <p>
+              Real-time audit log of transfers, deposits, and account
+              activities across Fhast Pay.
+            </p>
           </div>
         </header>
 
@@ -107,58 +121,103 @@ function AdminTransactions() {
             </div>
           </div>
 
-          <div className={styles.tableWrapper}>
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th>Reference</th>
-                  <th>User</th>
-                  <th>Type</th>
-                  <th>Amount</th>
-                  <th>Status</th>
-                  <th>Timestamp</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {filtered.map((tx) => (
-                  <tr key={tx.id}>
-                    <td>
-                      <span className={styles.refCode}>{tx.reference}</span>
-                    </td>
-                    <td>
-                      <strong className={styles.userName}>{tx.user}</strong>
-                    </td>
-                    <td>
-                      <span className={styles.typeBadge}>
-                        {tx.direction === "DEBIT" ? (
-                          <FiArrowUpRight className={styles.debitIcon} />
-                        ) : (
-                          <FiArrowDownLeft className={styles.creditIcon} />
-                        )}
-                        {tx.type}
-                      </span>
-                    </td>
-                    <td>
-                      <strong
-                        className={`${styles.amount} ${
-                          tx.direction === "DEBIT" ? styles.amountDebit : styles.amountCredit
-                        }`}
-                      >
-                        {tx.amount}
-                      </strong>
-                    </td>
-                    <td>
-                      <span className={styles.statusSuccess}>{tx.status}</span>
-                    </td>
-                    <td>
-                      <span className={styles.dateText}>{tx.date}</span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className={styles.resultCount}>
+            Showing <strong>{transactions.length}</strong> of{" "}
+            <strong>{total}</strong> transactions
           </div>
+
+          {error && (
+            <div className={styles.errorBanner} role="alert">
+              <FiAlertCircle />
+              <span>{error}</span>
+            </div>
+          )}
+
+          {isLoading ? (
+            <div className={styles.loadingState}>
+              <FiRefreshCw className={styles.spinner} />
+              <p>Loading transactions...</p>
+            </div>
+          ) : transactions.length === 0 ? (
+            <EmptyState
+              icon={<FiSearch />}
+              title="No transactions found"
+              description={
+                debouncedSearch || filterType !== "ALL"
+                  ? "Try adjusting your filters or search."
+                  : "No ledger entries yet."
+              }
+            />
+          ) : (
+            <div className={styles.tableWrapper}>
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th>Reference</th>
+                    <th>User</th>
+                    <th>Type</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Timestamp</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {transactions.map((tx) => (
+                    <tr key={tx.id}>
+                      <td>
+                        <span className={styles.refCode}>{tx.reference}</span>
+                      </td>
+                      <td>
+                        <strong className={styles.userName}>
+                          {getTransactionUserLabel(tx)}
+                        </strong>
+                      </td>
+                      <td>
+                        <span className={styles.typeBadge}>
+                          {tx.direction === "DEBIT" ? (
+                            <FiArrowUpRight className={styles.debitIcon} />
+                          ) : (
+                            <FiArrowDownLeft className={styles.creditIcon} />
+                          )}
+                          {tx.type}
+                        </span>
+                      </td>
+                      <td>
+                        <strong
+                          className={`${styles.amount} ${
+                            tx.direction === "DEBIT"
+                              ? styles.amountDebit
+                              : styles.amountCredit
+                          }`}
+                        >
+                          {formatAdminMoney(tx.amount)}
+                        </strong>
+                      </td>
+                      <td>
+                        <span
+                          className={
+                            tx.status === "SUCCESSFUL"
+                              ? styles.statusSuccess
+                              : tx.status === "FAILED"
+                                ? styles.statusFailed
+                                : styles.statusPending
+                          }
+                        >
+                          {tx.status}
+                        </span>
+                      </td>
+                      <td>
+                        <span className={styles.dateText}>
+                          {formatAdminDate(tx.createdAt)}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </section>
       </div>
     </main>
