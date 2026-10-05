@@ -1,6 +1,8 @@
 import express from "express";
 import cors from "cors";
 import authRoutes from "./Routes/authRoute.js";
+import accountRoutes from "./Routes/accountRoute.js";
+import adminRoutes from "./Routes/adminRoute.js";
 import transactionRoute from "./Routes/transactionRoute.js";
 import errorMiddleware from "./Middleware/errorMiddleware.js";
 
@@ -11,6 +13,9 @@ app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/admin", adminRoutes);
+app.use("/api/accounts", accountRoutes);
+app.use("/api/v1/accounts", accountRoutes);
 app.use("/api/transactions", transactionRoute);
 app.use("/api/v1/transactions", transactionRoute);
 

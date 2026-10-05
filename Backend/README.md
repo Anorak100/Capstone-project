@@ -15,6 +15,20 @@ This directory contains the API for the Fhast Pay capstone project. PostgreSQL i
 - `POST /api/v1/auth/register` creates an active user and bank account.
 - `POST /api/v1/auth/login` accepts a phone number and password, then returns a JWT.
 
+## Admin API
+
+Admin endpoints require a JWT belonging to an active user with the `ADMIN` role:
+
+- `GET /api/v1/admin/users?page=1&limit=20&search=` lists users and their accounts.
+- `GET /api/v1/admin/users/:userId` returns a user, account details, and recent ledger entries.
+- `PATCH /api/v1/admin/users/:userId/status` accepts `{ "isActive": false }` to freeze a user and their active accounts, or `true` to reactivate accounts frozen by this operation.
+- `GET /api/v1/admin/transactions` lists ledger entries; filters include `type`, `status`, `userId`, `reference`, `from`, and `to`.
+- `GET /api/v1/admin/transactions/:reference` returns one ledger entry or both entries for a transfer reference.
+- `GET /api/v1/admin/metrics` returns user/account totals and successful transfer totals grouped by currency.
+- `GET /api/v1/admin/transactions/flagged?minAmount=1000000` lists successful transfers above an explicit amount threshold. These are high-value review candidates, not an automated fraud determination.
+
+The last active administrator cannot be deactivated, and administrators cannot deactivate their own account.
+
 ## Transfers and history
 
 Both endpoints require `Authorization: Bearer <token>`:
