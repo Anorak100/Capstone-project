@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { registerUser } from "../services/authService";
+import { registerUser } from "../../services/authService";
 import styles from "./Register.module.css";
 
 function Register() {
@@ -138,7 +138,11 @@ function Register() {
             />
           </div>
 
-          {error && <p className={styles.errorMessage} role="alert">{error}</p>}
+          {error && (
+            <p className={styles.errorMessage} role="alert">
+              {error}
+            </p>
+          )}
 
           <button
             type="submit"

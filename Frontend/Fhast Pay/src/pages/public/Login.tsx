@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { loginUser } from "../services/authService";
+import { loginUser } from "../../services/authService";
 import styles from "./Login.module.css";
 
 function Login() {
@@ -25,7 +25,11 @@ function Login() {
       localStorage.setItem("authToken", response.data.token);
       navigate("/dashboard");
     } catch (requestError) {
-      setError(requestError instanceof Error ? requestError.message : "Unable to sign in");
+      setError(
+        requestError instanceof Error
+          ? requestError.message
+          : "Unable to sign in",
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -67,16 +71,29 @@ function Login() {
             />
           </div>
 
-          {notice && <p className={styles.noticeMessage} role="status">{notice}</p>}
-          {error && <p className={styles.errorMessage} role="alert">{error}</p>}
+          {notice && (
+            <p className={styles.noticeMessage} role="status">
+              {notice}
+            </p>
+          )}
+          {error && (
+            <p className={styles.errorMessage} role="alert">
+              {error}
+            </p>
+          )}
 
-          <button type="submit" className={styles.loginButton} disabled={isSubmitting}>
+          <button
+            type="submit"
+            className={styles.loginButton}
+            disabled={isSubmitting}
+          >
             {isSubmitting ? "Signing in..." : "Sign In"}
           </button>
         </form>
 
         <p className={styles.registerText}>
-          Don&apos;t have an account? <Link to="/register">Create an account</Link>
+          Don&apos;t have an account?{" "}
+          <Link to="/register">Create an account</Link>
         </p>
       </div>
     </main>

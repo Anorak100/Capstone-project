@@ -1,0 +1,119 @@
+.settings {
+  min-height: 100%;
+  padding-block: var(--space-6);
+  background: var(--color-background);
+}
+
+.container {
+  width: min(calc(100% - (2 * var(--page-padding))), var(--container-width));
+  margin-inline: auto;
+}
+
+.header {
+  margin-bottom: var(--space-8);
+}
+
+.eyebrow {
+  margin: 0 0 var(--space-2);
+  color: var(--color-primary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.header h1 {
+  margin: 0 0 var(--space-2);
+  color: var(--color-text);
+  font-size: 2rem;
+  line-height: 1.2;
+}
+
+.header p:last-child {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.card {
+  overflow: hidden;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.setting {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-6);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.setting:last-child {
+  border-bottom: none;
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 45px;
+  height: 45px;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  border-radius: var(--radius-md);
+  font-size: 1.2rem;
+}
+
+.content {
+  flex: 1;
+}
+
+.content h2 {
+  margin: 0 0 var(--space-1);
+  color: var(--color-text);
+  font-size: 0.95rem;
+}
+
+.content p {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.status {
+  flex-shrink: 0;
+  padding: var(--space-1) var(--space-2);
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+@media (max-width: 600px) {
+  .settings {
+    padding-block: var(--space-4);
+  }
+
+  .container {
+    width: 100%;
+  }
+
+  .header h1 {
+    font-size: 1.75rem;
+  }
+
+  .setting {
+    align-items: flex-start;
+  }
+
+  .status {
+    margin-left: auto;
+  }
+}
