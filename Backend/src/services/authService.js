@@ -2,6 +2,9 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import prisma from "../Config/prisma.js";
 import { generateAccountNumber } from "../utils/generateAccountNumber.js";
+import generateReference from "../utils/generateReference.js";
+
+const WELCOME_BONUS_AMOUNT = 100000.00;
 
 const createError = (message, statusCode) =>
   Object.assign(new Error(message), { statusCode });
@@ -57,6 +60,20 @@ export const registerUser = async (data) => {
           data: {
             userId: user.id,
             accountNumber: generateAccountNumber(phone),
+            balance: WELCOME_BONUS_AMOUNT,
+          },
+        });
+
+        await transaction.transaction.create({
+          data: {
+            reference: generateReference(),
+            amount: WELCOME_BONUS_AMOUNT,
+            type: "DEPOSIT",
+            direction: "CREDIT",
+            status: "SUCCESSFUL",
+            description: "Welcome signup bonus",
+            recipientId: user.id,
+            toAccountId: account.id,
           },
         });
 
