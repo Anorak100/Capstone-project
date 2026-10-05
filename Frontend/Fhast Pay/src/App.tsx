@@ -9,8 +9,6 @@ import Register from "./pages/public/Register";
 import Dashboard from "./pages/customer/Dashboard";
 import CustomerLayout from "./layouts/CustomerLayout";
 import Transfer from "./pages/customer/Transfer";
-import Deposit from "./pages/customer/Deposit";
-import Withdraw from "./pages/customer/Withdraw";
 import Transactions from "./pages/customer/Transactions";
 import Profile from "./pages/customer/Profile";
 
@@ -34,8 +32,6 @@ function App() {
         <Route element={<CustomerLayout />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/transfer" element={<Transfer />} />
-          <Route path="/deposit" element={<Deposit />} />
-          <Route path="/withdraw" element={<Withdraw />} />
           <Route path="/transactions" element={<Transactions />} />
           <Route path="/profile" element={<Profile />} />
         </Route>

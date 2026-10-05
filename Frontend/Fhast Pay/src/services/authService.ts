@@ -32,7 +32,10 @@ export type LoginData = {
   user: User;
 };
 
-const request = async <T>(path: string, body: unknown): Promise<ApiResponse<T>> => {
+const request = async <T>(
+  path: string,
+  body: unknown,
+): Promise<ApiResponse<T>> => {
   const response = await fetch(`${API_URL}/auth/${path}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -41,7 +44,22 @@ const request = async <T>(path: string, body: unknown): Promise<ApiResponse<T>> 
   const result = (await response.json()) as ApiResponse<T>;
 
   if (!response.ok || !result.success) {
-    throw new Error(result.message || "The request could not be completed");
+    const errorResult = result as ApiResponse<T> & {
+      errors?: {
+        field: string;
+        message: string;
+      }[];
+    };
+
+    const validationMessage = errorResult.errors
+      ?.map((error) => error.message)
+      .join(", ");
+
+    throw new Error(
+      validationMessage ||
+        result.message ||
+        "The request could not be completed",
+    );
   }
   return result;
 };

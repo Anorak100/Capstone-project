@@ -1,90 +1,91 @@
-import { NavLink } from "react-router-dom";
-import { FiSend, FiPlusCircle, FiMinusCircle, FiUser } from "react-icons/fi";
+import { useEffect, useState } from "react";
+import { getBalance, type Account } from "../../services/accountService";
+import EmptyState from "../../components/common/EmptyState";
 import styles from "./Dashboard.module.css";
 
 function Dashboard() {
+  const [account, setAccount] = useState<Account | null>(null);
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const loadBalance = async () => {
+      const token = localStorage.getItem("authToken");
+
+      if (!token) {
+        setError("You are not signed in.");
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const accounts = await getBalance(token);
+
+        setAccount(accounts[0] ?? null);
+      } catch (requestError) {
+        setError(
+          requestError instanceof Error
+            ? requestError.message
+            : "Unable to load account balance",
+        );
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadBalance();
+  }, []);
+
   return (
     <main className={styles.dashboard}>
       <div className={styles.container}>
         <header className={styles.header}>
           <div>
-            <p className={styles.greeting}>Welcome back</p>
-            <h1>Blessing</h1>
+            <p className={styles.eyebrow}>Customer dashboard</p>
+            <h1>Welcome back</h1>
+            <p>Here&apos;s an overview of your Fhast Pay account.</p>
           </div>
-
-          <NavLink
-            to="/profile"
-            className={styles.profileButton}
-            aria-label="Profile"
-          >
-            <FiUser />
-          </NavLink>
         </header>
 
         <section className={styles.balanceCard}>
           <div>
-            <p className={styles.balanceLabel}>Available balance</p>
+            <span>Available balance</span>
 
-            <h2>₦0.00</h2>
+            {isLoading ? (
+              <strong>Loading...</strong>
+            ) : error ? (
+              <strong>Unable to load balance</strong>
+            ) : (
+              <strong>
+                {account?.currency ?? "NGN"}{" "}
+                {Number(account?.balance ?? 0).toLocaleString("en-NG", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
+              </strong>
+            )}
+          </div>
 
-            <p className={styles.accountNumber}>Account ####0000</p>
+          <div>
+            <span>Account</span>
+            <strong>{account?.accountNumber ?? "—"}</strong>
           </div>
         </section>
 
-        <section className={styles.section}>
-          <div className={styles.sectionHeader}>
-            <h2>Quick actions</h2>
-          </div>
-
-          <div className={styles.actions}>
-            <NavLink to="/transfer" className={styles.actionCard}>
-              <FiSend className={styles.actionIcon} />
-
-              <span>
-                <strong>Transfer</strong>
-                <small>Send money</small>
-              </span>
-            </NavLink>
-
-            <NavLink to="/deposit" className={styles.actionCard}>
-              <FiPlusCircle className={styles.actionIcon} />
-
-              <span>
-                <strong>Deposit</strong>
-                <small>Add money</small>
-              </span>
-            </NavLink>
-
-            <NavLink to="/withdraw" className={styles.actionCard}>
-              <FiMinusCircle className={styles.actionIcon} />
-
-              <span>
-                <strong>Withdraw</strong>
-                <small>Take out money</small>
-              </span>
-            </NavLink>
-          </div>
-        </section>
+        {error && <p role="alert">{error}</p>}
 
         <section className={styles.section}>
           <div className={styles.sectionHeader}>
-            <h2>Recent transactions</h2>
-
-            <NavLink to="/transactions" className={styles.viewAll}>
-              View all
-            </NavLink>
+            <div>
+              <h2>Recent transactions</h2>
+              <p>Your latest account activity will appear here.</p>
+            </div>
           </div>
 
-          <div className={styles.Recenttransactions}>
-            <div className={styles.transactionsIcon}>#</div>
-
-            <h3>No transactions yet</h3>
-
-            <p>
-              Your transactions will appear here once you start using your Fhast
-              Pay account.
-            </p>
-          </div>
+          <EmptyState
+            title="No transactions yet"
+            description="Your transactions will appear here once you start using your Fhast Pay account."
+          />
         </section>
       </div>
     </main>
