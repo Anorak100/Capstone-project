@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import morgan from "morgan";
 import authRoutes from "./Routes/authRoute.js";
 import accountRoutes from "./Routes/accountRoute.js";
 import adminRoutes from "./Routes/adminRoute.js";
@@ -8,6 +9,7 @@ import errorMiddleware from "./Middleware/errorMiddleware.js";
 
 const app = express();
 
+app.use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev"));
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: true }));
