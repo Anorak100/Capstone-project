@@ -21,11 +21,6 @@ The frontend application for the Fhast Pay banking system.
 
 ## Setup
 
-```bash
-npm install
-npm run dev
-```
-
 Frontend runs on:
 
 ```text
