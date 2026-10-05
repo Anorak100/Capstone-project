@@ -14,3 +14,8 @@ export const recipientLookupSchema = z
     message: "Provide either a phone number or an account number",
     path: ["phone"]
   });
+
+export const setPinSchema = z.object({
+  pin: z.string().trim().regex(/^\d{4}$/, "PIN must be a 4-digit number"),
+  currentPin: z.string().trim().regex(/^\d{4}$/, "Current PIN must be a 4-digit number").optional()
+});

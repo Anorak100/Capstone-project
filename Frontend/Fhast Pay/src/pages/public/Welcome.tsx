@@ -144,7 +144,7 @@ function Welcome() {
             </div>
             <h3>Bank-Grade Security</h3>
             <p>
-              Protected by multi-layered encryption, 6-digit transaction PINs,
+              Protected by multi-layered encryption, 4-digit transaction PINs,
               and strict data privacy protocols.
             </p>
           </div>
@@ -168,7 +168,7 @@ function Welcome() {
           <div className={styles.attributionBadge}>
             <span>
               Made with <span className={styles.heart}>❤️</span> by{" "}
-              <strong>Group 13</strong> · Hajime Cohort (Backend Development)
+              <strong>Group 13</strong> · TS Academy · Hajime Cohort (Backend Development)
             </span>
           </div>
           <p className={styles.copyright}>

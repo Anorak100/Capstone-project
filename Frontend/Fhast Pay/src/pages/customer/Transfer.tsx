@@ -7,14 +7,23 @@ import {
   FiArrowRight,
   FiRefreshCw,
   FiDollarSign,
+  FiLock,
+  FiShield,
+  FiX,
 } from "react-icons/fi";
 import {
   getBalance,
   lookupRecipient,
+  getPinStatus,
+  setTransactionPin,
   type Account,
   type Recipient,
 } from "../../services/accountService";
-import { makeTransfer, type TransferData } from "../../services/transactionService";
+import {
+  makeTransfer,
+  TransferApiError,
+  type TransferData,
+} from "../../services/transactionService";
 import styles from "./Transfer.module.css";
 
 const QUICK_AMOUNTS = [1000, 2000, 5000, 10000, 20000, 50000];
@@ -30,6 +39,15 @@ function Transfer() {
   const [isLookingUp, setIsLookingUp] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // PIN Management states
+  const [hasPin, setHasPin] = useState(false);
+  const [showPinModal, setShowPinModal] = useState(false);
+  const [showCreatePinModal, setShowCreatePinModal] = useState(false);
+  const [enteredPin, setEnteredPin] = useState("");
+  const [newPin, setNewPin] = useState("");
+  const [confirmPin, setConfirmPin] = useState("");
+  const [pinError, setPinError] = useState("");
+
   useEffect(() => {
     const loadAccount = async () => {
       const token = localStorage.getItem("authToken");
@@ -41,8 +59,12 @@ function Transfer() {
       }
 
       try {
-        const accounts = await getBalance(token);
+        const [accounts, pinStatus] = await Promise.all([
+          getBalance(token),
+          getPinStatus(token).catch(() => false),
+        ]);
         setAccount(accounts[0] ?? null);
+        setHasPin(pinStatus);
 
         if (!accounts[0]) {
           setError("No active account was found.");
@@ -100,9 +122,10 @@ function Transfer() {
     }
   };
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError("");
+    setPinError("");
 
     const token = localStorage.getItem("authToken");
     if (!token) {
@@ -131,7 +154,23 @@ function Transfer() {
       return;
     }
 
+    // Check PIN status and prompt appropriate modal
+    if (!hasPin) {
+      setNewPin("");
+      setConfirmPin("");
+      setShowCreatePinModal(true);
+    } else {
+      setEnteredPin("");
+      setShowPinModal(true);
+    }
+  };
+
+  const executeTransfer = async (pinToUse: string) => {
+    const token = localStorage.getItem("authToken");
+    if (!token || !account || !recipient) return;
+
     setIsSubmitting(true);
+    setPinError("");
 
     try {
       const result = await makeTransfer(token, {
@@ -139,19 +178,98 @@ function Transfer() {
         toAccount: recipient.accountNumber,
         amount,
         description: description.trim() || undefined,
+        pin: pinToUse,
       });
 
+      setShowPinModal(false);
+      setShowCreatePinModal(false);
+      setEnteredPin("");
       setSuccessData(result);
+
       // Refresh balance
       const updatedAccounts = await getBalance(token).catch(() => []);
       if (updatedAccounts[0]) setAccount(updatedAccounts[0]);
     } catch (requestError) {
-      setError(
-        requestError instanceof Error
-          ? requestError.message
-          : "Unable to complete the transfer",
-      );
+      if (
+        requestError instanceof TransferApiError &&
+        requestError.code === "PIN_NOT_SET"
+      ) {
+        setHasPin(false);
+        setShowPinModal(false);
+        setShowCreatePinModal(true);
+        setPinError("");
+      } else if (
+        requestError instanceof TransferApiError &&
+        requestError.code === "INVALID_PIN"
+      ) {
+        setEnteredPin("");
+        setPinError(
+          requestError.message || "Invalid 4-digit transaction PIN",
+        );
+      } else if (showPinModal || showCreatePinModal) {
+        setPinError(
+          requestError instanceof Error
+            ? requestError.message
+            : "Unable to complete the transfer",
+        );
+      } else {
+        setError(
+          requestError instanceof Error
+            ? requestError.message
+            : "Unable to complete the transfer",
+        );
+      }
     } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleAuthorizeTransfer = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!/^\d{4}$/.test(enteredPin)) {
+      setPinError("Please enter your 4-digit PIN");
+      return;
+    }
+    await executeTransfer(enteredPin);
+  };
+
+  const handleCreatePinAndTransfer = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPinError("");
+
+    if (!/^\d{4}$/.test(newPin)) {
+      setPinError("PIN must be a 4-digit number");
+      return;
+    }
+    if (newPin !== confirmPin) {
+      setPinError("PINs do not match");
+      return;
+    }
+
+    const token = localStorage.getItem("authToken");
+    if (!token) return;
+
+    setIsSubmitting(true);
+    try {
+      await setTransactionPin(token, { pin: newPin });
+      setHasPin(true);
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        try {
+          const parsed = JSON.parse(storedUser) as Record<string, unknown>;
+          localStorage.setItem(
+            "user",
+            JSON.stringify({ ...parsed, hasPin: true }),
+          );
+        } catch {
+          // ignore
+        }
+      }
+      await executeTransfer(newPin);
+    } catch (err) {
+      setPinError(
+        err instanceof Error ? err.message : "Failed to set transaction PIN",
+      );
       setIsSubmitting(false);
     }
   };
@@ -162,6 +280,7 @@ function Transfer() {
     setAmount("");
     setDescription("");
     setError("");
+    setPinError("");
   };
 
   return (
@@ -369,6 +488,205 @@ function Transfer() {
           )}
         </section>
       </div>
+
+      {/* ENTER 4-DIGIT PIN MODAL */}
+      {showPinModal && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modalCard} role="dialog" aria-modal="true">
+            <button
+              type="button"
+              className={styles.modalCloseBtn}
+              onClick={() => {
+                setShowPinModal(false);
+                setPinError("");
+              }}
+              aria-label="Close"
+            >
+              <FiX />
+            </button>
+
+            <div className={styles.modalIconBadge}>
+              <FiLock />
+            </div>
+
+            <span className={styles.modalTag}>SECURITY VERIFICATION</span>
+            <h2 className={styles.modalTitle}>Enter 4-Digit PIN</h2>
+            <p className={styles.modalDesc}>
+              Authorize transfer of{" "}
+              <strong>
+                ₦
+                {Number(amount).toLocaleString("en-NG", {
+                  minimumFractionDigits: 2,
+                })}
+              </strong>{" "}
+              to <strong>{recipient?.accountName}</strong>.
+            </p>
+
+            <form onSubmit={handleAuthorizeTransfer} className={styles.pinForm}>
+              <div className={styles.pinInputWrapper}>
+                <input
+                  type="password"
+                  inputMode="numeric"
+                  pattern="\d{4}"
+                  maxLength={4}
+                  autoFocus
+                  required
+                  placeholder="••••"
+                  value={enteredPin}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/\D/g, "").slice(0, 4);
+                    setEnteredPin(val);
+                    if (pinError) setPinError("");
+                  }}
+                  className={styles.pinInput}
+                />
+              </div>
+
+              {pinError && (
+                <div className={styles.modalErrorAlert} role="alert">
+                  <FiAlertCircle />
+                  <span>{pinError}</span>
+                </div>
+              )}
+
+              <div className={styles.modalBtnRow}>
+                <button
+                  type="button"
+                  className={styles.cancelBtn}
+                  onClick={() => {
+                    setShowPinModal(false);
+                    setPinError("");
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className={styles.confirmBtn}
+                  disabled={isSubmitting || enteredPin.length !== 4}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <FiRefreshCw className={styles.spinner} /> Authorizing...
+                    </>
+                  ) : (
+                    "Authorize Transfer"
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* CREATE 4-DIGIT PIN MODAL (FIRST TIME SETUP) */}
+      {showCreatePinModal && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modalCard} role="dialog" aria-modal="true">
+            <button
+              type="button"
+              className={styles.modalCloseBtn}
+              onClick={() => {
+                setShowCreatePinModal(false);
+                setPinError("");
+              }}
+              aria-label="Close"
+            >
+              <FiX />
+            </button>
+
+            <div className={styles.modalIconBadge}>
+              <FiShield />
+            </div>
+
+            <span className={styles.modalTag}>FIRST-TIME SETUP</span>
+            <h2 className={styles.modalTitle}>Create 4-Digit Transaction PIN</h2>
+            <p className={styles.modalDesc}>
+              Before sending money for the first time, set up a 4-digit PIN to secure all your future transfers.
+            </p>
+
+            <form onSubmit={handleCreatePinAndTransfer} className={styles.pinForm}>
+              <div className={styles.formGroup}>
+                <label htmlFor="newPin">New 4-Digit PIN</label>
+                <input
+                  id="newPin"
+                  type="password"
+                  inputMode="numeric"
+                  pattern="\d{4}"
+                  maxLength={4}
+                  autoFocus
+                  required
+                  placeholder="Enter 4-digit PIN"
+                  value={newPin}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/\D/g, "").slice(0, 4);
+                    setNewPin(val);
+                    if (pinError) setPinError("");
+                  }}
+                  className={styles.pinInput}
+                />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label htmlFor="confirmPin">Confirm 4-Digit PIN</label>
+                <input
+                  id="confirmPin"
+                  type="password"
+                  inputMode="numeric"
+                  pattern="\d{4}"
+                  maxLength={4}
+                  required
+                  placeholder="Re-enter 4-digit PIN"
+                  value={confirmPin}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/\D/g, "").slice(0, 4);
+                    setConfirmPin(val);
+                    if (pinError) setPinError("");
+                  }}
+                  className={styles.pinInput}
+                />
+              </div>
+
+              {pinError && (
+                <div className={styles.modalErrorAlert} role="alert">
+                  <FiAlertCircle />
+                  <span>{pinError}</span>
+                </div>
+              )}
+
+              <div className={styles.modalBtnRow}>
+                <button
+                  type="button"
+                  className={styles.cancelBtn}
+                  onClick={() => {
+                    setShowCreatePinModal(false);
+                    setPinError("");
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className={styles.confirmBtn}
+                  disabled={
+                    isSubmitting ||
+                    newPin.length !== 4 ||
+                    confirmPin.length !== 4
+                  }
+                >
+                  {isSubmitting ? (
+                    <>
+                      <FiRefreshCw className={styles.spinner} /> Saving PIN...
+                    </>
+                  ) : (
+                    "Save PIN & Transfer"
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

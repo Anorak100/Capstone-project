@@ -9,6 +9,9 @@ import {
   FiLock,
   FiArrowRight,
   FiAlertCircle,
+  FiGift,
+  FiX,
+  FiCheckCircle,
 } from "react-icons/fi";
 import { registerUser } from "../../services/authService";
 import styles from "./Register.module.css";
@@ -17,6 +20,10 @@ function Register() {
   const navigate = useNavigate();
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [bonusDetails, setBonusDetails] = useState<{
+    firstName: string;
+    accountNumber: string;
+  } | null>(null);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -34,8 +41,9 @@ function Register() {
       return;
     }
 
+    const firstName = String(formData.get("firstName") ?? "").trim();
     const data = {
-      firstName: String(formData.get("firstName") ?? "").trim(),
+      firstName,
       lastName: String(formData.get("lastName") ?? "").trim(),
       email: String(formData.get("email") ?? "").trim(),
       phone: String(formData.get("phone") ?? "").trim(),
@@ -45,7 +53,11 @@ function Register() {
     setIsSubmitting(true);
     try {
       const response = await registerUser(data);
-      navigate("/login", { state: { notice: response.message } });
+      // Display celebratory welcome bonus modal
+      setBonusDetails({
+        firstName: response.data?.user?.firstName || firstName,
+        accountNumber: response.data?.account?.accountNumber || "",
+      });
     } catch (requestError) {
       setError(
         requestError instanceof Error
@@ -55,6 +67,15 @@ function Register() {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleProceedToLogin = () => {
+    navigate("/login", {
+      state: {
+        notice:
+          "Account created with ₦100,000 welcome bonus! Please sign in with your phone number and 6-digit password.",
+      },
+    });
   };
 
   return (
@@ -203,6 +224,58 @@ function Register() {
           Already have an account? <Link to="/login">Sign in</Link>
         </p>
       </div>
+
+      {bonusDetails && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modalCard} role="dialog" aria-modal="true">
+            <button
+              type="button"
+              className={styles.modalCloseBtn}
+              onClick={handleProceedToLogin}
+              aria-label="Close"
+            >
+              <FiX />
+            </button>
+
+            <div className={styles.modalCelebrationBadge}>
+              <FiGift className={styles.giftIcon} />
+            </div>
+
+            <span className={styles.modalPill}>WELCOME BONUS UNLOCKED</span>
+
+            <h2 className={styles.modalTitle}>
+              Congratulations, {bonusDetails.firstName}! 🎉
+            </h2>
+
+            <p className={styles.modalSubtitle}>
+              Your Fhast Pay banking account has been created successfully.
+            </p>
+
+            <div className={styles.bonusAmountCard}>
+              <span className={styles.bonusLabel}>Demo Balance Credited</span>
+              <div className={styles.bonusAmount}>₦100,000.00</div>
+              {bonusDetails.accountNumber && (
+                <div className={styles.accountNumberBadge}>
+                  Account Number: <strong>{bonusDetails.accountNumber}</strong>
+                </div>
+              )}
+            </div>
+
+            <p className={styles.modalNote}>
+              You have been given a <strong>₦100,000 signup bonus</strong> to test instant transfers, explore your dashboard, and experience real-time transactions out of the box!
+            </p>
+
+            <button
+              type="button"
+              className={styles.modalActionBtn}
+              onClick={handleProceedToLogin}
+            >
+              <span>Proceed to Sign In</span>
+              <FiArrowRight />
+            </button>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

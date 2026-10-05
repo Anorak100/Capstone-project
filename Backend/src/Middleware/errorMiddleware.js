@@ -12,7 +12,8 @@ const errorMiddleware = (error, req, res, next) => {
 
 	res.status(statusCode).json({
 		success: false,
-		message
+		message,
+		...(error.code ? { code: error.code } : {})
 	});
 };
 

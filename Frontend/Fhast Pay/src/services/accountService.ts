@@ -68,3 +68,42 @@ export const lookupRecipient = async (
 
   return result.data;
 };
+
+export const getPinStatus = async (token: string): Promise<boolean> => {
+  const response = await fetch(`${API_URL}/accounts/pin-status`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.message || "Failed to retrieve PIN status");
+  }
+
+  return Boolean(result.data?.hasPin);
+};
+
+export const setTransactionPin = async (
+  token: string,
+  payload: { pin: string; currentPin?: string },
+): Promise<string> => {
+  const response = await fetch(`${API_URL}/accounts/pin`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.message || "Failed to save transaction PIN");
+  }
+
+  return result.message || "Transaction PIN saved successfully";
+};
+

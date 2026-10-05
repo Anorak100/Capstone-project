@@ -48,6 +48,7 @@ model User {
   email                String        @unique
   phone                String        @unique
   password             String
+  transactionPin       String?
   role                 Role          @default(CUSTOMER)
   isActive             Boolean       @default(true)
   createdAt            DateTime      @default(now())

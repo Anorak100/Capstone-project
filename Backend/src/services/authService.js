@@ -18,6 +18,7 @@ const toPublicUser = (user) => ({
   phone: user.phone,
   role: user.role,
   isActive: user.isActive,
+  hasPin: Boolean(user.transactionPin),
 });
 
 const isAccountNumberCollision = (error) => {

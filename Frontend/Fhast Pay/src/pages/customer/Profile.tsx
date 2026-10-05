@@ -8,8 +8,16 @@ import {
   FiLock,
   FiCheckCircle,
   FiSmartphone,
+  FiX,
+  FiAlertCircle,
+  FiRefreshCw,
 } from "react-icons/fi";
-import { getBalance, type Account } from "../../services/accountService";
+import {
+  getBalance,
+  getPinStatus,
+  setTransactionPin,
+  type Account,
+} from "../../services/accountService";
 import styles from "./Profile.module.css";
 
 function Profile() {
@@ -22,6 +30,16 @@ function Profile() {
   } | null>(null);
   const [copied, setCopied] = useState(false);
 
+  // PIN state
+  const [hasPin, setHasPin] = useState(false);
+  const [showPinModal, setShowPinModal] = useState(false);
+  const [currentPin, setCurrentPin] = useState("");
+  const [newPin, setNewPin] = useState("");
+  const [confirmPin, setConfirmPin] = useState("");
+  const [pinError, setPinError] = useState("");
+  const [pinSuccess, setPinSuccess] = useState("");
+  const [isSubmittingPin, setIsSubmittingPin] = useState(false);
+
   useEffect(() => {
     const token = localStorage.getItem("authToken");
     if (!token) return;
@@ -33,11 +51,25 @@ function Profile() {
       })
       .catch(() => {});
 
+    // Check transaction PIN status
+    getPinStatus(token)
+      .then((status) => setHasPin(status))
+      .catch(() => {});
+
     // Try reading stored user or parse token
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
       try {
-        setUser(JSON.parse(storedUser));
+        const parsed = JSON.parse(storedUser) as {
+          fullName?: string;
+          email?: string;
+          phone?: string;
+          hasPin?: boolean;
+        };
+        setUser(parsed);
+        if (parsed.hasPin) {
+          setHasPin(true);
+        }
       } catch {
         // ignore
       }
@@ -55,6 +87,70 @@ function Profile() {
     localStorage.removeItem("authToken");
     localStorage.removeItem("user");
     navigate("/login");
+  };
+
+  const handleOpenPinModal = () => {
+    setCurrentPin("");
+    setNewPin("");
+    setConfirmPin("");
+    setPinError("");
+    setShowPinModal(true);
+  };
+
+  const handleSavePin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPinError("");
+    setPinSuccess("");
+
+    if (hasPin && !/^\d{4}$/.test(currentPin)) {
+      setPinError("Please enter your current 4-digit PIN");
+      return;
+    }
+    if (!/^\d{4}$/.test(newPin)) {
+      setPinError("New PIN must be a 4-digit number");
+      return;
+    }
+    if (newPin !== confirmPin) {
+      setPinError("New PINs do not match");
+      return;
+    }
+
+    const token = localStorage.getItem("authToken");
+    if (!token) return;
+
+    setIsSubmittingPin(true);
+    try {
+      await setTransactionPin(token, {
+        pin: newPin,
+        currentPin: hasPin ? currentPin : undefined,
+      });
+      setHasPin(true);
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        try {
+          const parsed = JSON.parse(storedUser) as Record<string, unknown>;
+          localStorage.setItem(
+            "user",
+            JSON.stringify({ ...parsed, hasPin: true }),
+          );
+        } catch {
+          // ignore
+        }
+      }
+      setShowPinModal(false);
+      setPinSuccess(
+        hasPin
+          ? "Transaction PIN updated successfully!"
+          : "Transaction PIN created successfully!",
+      );
+      setTimeout(() => setPinSuccess(""), 4000);
+    } catch (err) {
+      setPinError(
+        err instanceof Error ? err.message : "Failed to update transaction PIN",
+      );
+    } finally {
+      setIsSubmittingPin(false);
+    }
   };
 
   const displayName = user?.fullName || "Fhast Pay Customer";
@@ -135,16 +231,39 @@ function Profile() {
         {/* SECURITY & PREFERENCES */}
         <section className={styles.sectionCard}>
           <h3 className={styles.cardTitle}>Security & Credentials</h3>
+
+          {pinSuccess && (
+            <div className={styles.successBanner} role="status">
+              <FiCheckCircle />
+              <span>{pinSuccess}</span>
+            </div>
+          )}
+
           <div className={styles.securityList}>
             <div className={styles.securityItem}>
               <div className={styles.secIcon}>
                 <FiLock />
               </div>
               <div className={styles.secContent}>
-                <strong>6-Digit Transaction PIN</strong>
-                <p>Used to authorize money transfers and account changes</p>
+                <strong>4-Digit Transaction PIN</strong>
+                <p>Used to authorize money transfers and transactions</p>
               </div>
-              <span className={styles.statusPill}>Protected</span>
+              <div className={styles.secActionCol}>
+                <span
+                  className={
+                    hasPin ? styles.statusPillActive : styles.statusPillInactive
+                  }
+                >
+                  {hasPin ? "Active & Protected" : "Not Set Up"}
+                </span>
+                <button
+                  type="button"
+                  className={styles.pinActionBtn}
+                  onClick={handleOpenPinModal}
+                >
+                  {hasPin ? "Change PIN" : "Create PIN"}
+                </button>
+              </div>
             </div>
 
             <div className={styles.securityItem}>
@@ -183,6 +302,141 @@ function Profile() {
           </button>
         </div>
       </div>
+
+      {/* TRANSACTION PIN MODAL */}
+      {showPinModal && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modalCard} role="dialog" aria-modal="true">
+            <button
+              type="button"
+              className={styles.modalCloseBtn}
+              onClick={() => setShowPinModal(false)}
+              aria-label="Close"
+            >
+              <FiX />
+            </button>
+
+            <div className={styles.modalIconBadge}>
+              <FiLock />
+            </div>
+
+            <span className={styles.modalTag}>SECURITY SETTINGS</span>
+            <h2 className={styles.modalTitle}>
+              {hasPin ? "Change Transaction PIN" : "Create Transaction PIN"}
+            </h2>
+            <p className={styles.modalDesc}>
+              {hasPin
+                ? "Enter your current PIN and choose a new 4-digit PIN for authorizing transfers."
+                : "Create a 4-digit PIN to authorize transfers and secure your transactions."}
+            </p>
+
+            <form onSubmit={handleSavePin} className={styles.pinForm}>
+              {hasPin && (
+                <div className={styles.formGroup}>
+                  <label htmlFor="currentPin">Current 4-Digit PIN</label>
+                  <input
+                    id="currentPin"
+                    type="password"
+                    inputMode="numeric"
+                    pattern="\d{4}"
+                    maxLength={4}
+                    required
+                    autoFocus
+                    placeholder="Enter current PIN"
+                    value={currentPin}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/\D/g, "").slice(0, 4);
+                      setCurrentPin(val);
+                      if (pinError) setPinError("");
+                    }}
+                    className={styles.pinInput}
+                  />
+                </div>
+              )}
+
+              <div className={styles.formGroup}>
+                <label htmlFor="newPin">
+                  {hasPin ? "New 4-Digit PIN" : "4-Digit PIN"}
+                </label>
+                <input
+                  id="newPin"
+                  type="password"
+                  inputMode="numeric"
+                  pattern="\d{4}"
+                  maxLength={4}
+                  required
+                  autoFocus={!hasPin}
+                  placeholder="Enter 4-digit PIN"
+                  value={newPin}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/\D/g, "").slice(0, 4);
+                    setNewPin(val);
+                    if (pinError) setPinError("");
+                  }}
+                  className={styles.pinInput}
+                />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label htmlFor="confirmPin">Confirm 4-Digit PIN</label>
+                <input
+                  id="confirmPin"
+                  type="password"
+                  inputMode="numeric"
+                  pattern="\d{4}"
+                  maxLength={4}
+                  required
+                  placeholder="Re-enter 4-digit PIN"
+                  value={confirmPin}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/\D/g, "").slice(0, 4);
+                    setConfirmPin(val);
+                    if (pinError) setPinError("");
+                  }}
+                  className={styles.pinInput}
+                />
+              </div>
+
+              {pinError && (
+                <div className={styles.modalErrorAlert} role="alert">
+                  <FiAlertCircle />
+                  <span>{pinError}</span>
+                </div>
+              )}
+
+              <div className={styles.modalBtnRow}>
+                <button
+                  type="button"
+                  className={styles.cancelBtn}
+                  onClick={() => setShowPinModal(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className={styles.confirmBtn}
+                  disabled={
+                    isSubmittingPin ||
+                    newPin.length !== 4 ||
+                    confirmPin.length !== 4 ||
+                    (hasPin && currentPin.length !== 4)
+                  }
+                >
+                  {isSubmittingPin ? (
+                    <>
+                      <FiRefreshCw className={styles.spinner} /> Saving...
+                    </>
+                  ) : hasPin ? (
+                    "Update PIN"
+                  ) : (
+                    "Create PIN"
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

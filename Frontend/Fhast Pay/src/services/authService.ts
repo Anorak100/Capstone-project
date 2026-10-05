@@ -15,6 +15,7 @@ type User = {
   phone: string;
   role: string;
   isActive: boolean;
+  hasPin?: boolean;
 };
 
 export type RegistrationData = {

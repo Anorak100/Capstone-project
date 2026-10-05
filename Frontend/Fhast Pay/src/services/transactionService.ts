@@ -49,7 +49,17 @@ export type TransferRequest = {
   toAccount: string;
   amount: string;
   description?: string;
+  pin?: string;
 };
+
+export class TransferApiError extends Error {
+  code?: string;
+  constructor(message: string, code?: string) {
+    super(message);
+    this.name = "TransferApiError";
+    this.code = code;
+  }
+}
 
 const getErrorMessage = (result: {
   message?: string;
@@ -79,11 +89,12 @@ export const makeTransfer = async (
   });
 
   const result = (await response.json()) as ApiResponse<TransferData> & {
+    code?: string;
     errors?: { message?: string }[];
   };
 
   if (!response.ok || !result.success) {
-    throw new Error(getErrorMessage(result));
+    throw new TransferApiError(getErrorMessage(result), result.code);
   }
 
   return result.data;
