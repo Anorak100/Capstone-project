@@ -3,6 +3,7 @@ import {
   FiActivity,
   FiArrowDownCircle,
   FiArrowUpCircle,
+  FiTrendingUp,
 } from "react-icons/fi";
 import EmptyState from "../../components/common/EmptyState";
 import styles from "./AdminDashboard.module.css";
@@ -13,56 +14,73 @@ function AdminDashboard() {
       <div className={styles.container}>
         <header className={styles.header}>
           <div>
-            <p className={styles.eyebrow}>Administration</p>
-
-            <h1>Dashboard</h1>
-
-            <p>Monitor Fhast Pay activity and manage the platform.</p>
+            <div className={styles.systemStatus}>
+              <span className={styles.statusDot} />
+              Platform Operational
+            </div>
+            <h1>Admin Overview</h1>
+            <p>Monitor system volume, active accounts, and transactions across Fhast Pay.</p>
           </div>
         </header>
 
         <section className={styles.metrics}>
           <div className={styles.metricCard}>
-            <div className={styles.metricIcon}>
-              <FiUsers />
+            <div className={styles.metricTop}>
+              <div className={`${styles.metricIcon} ${styles.usersIcon}`}>
+                <FiUsers />
+              </div>
+              <span className={styles.trendPill}>
+                <FiTrendingUp /> +14%
+              </span>
             </div>
-
-            <div>
-              <span>Total users</span>
-              <strong>0</strong>
-            </div>
-          </div>
-
-          <div className={styles.metricCard}>
-            <div className={styles.metricIcon}>
-              <FiActivity />
-            </div>
-
-            <div>
-              <span>Total transactions</span>
-              <strong>0</strong>
+            <div className={styles.metricContent}>
+              <span className={styles.metricLabel}>Total Users</span>
+              <strong className={styles.metricValue}>1,248</strong>
             </div>
           </div>
 
           <div className={styles.metricCard}>
-            <div className={styles.metricIcon}>
-              <FiArrowDownCircle />
+            <div className={styles.metricTop}>
+              <div className={`${styles.metricIcon} ${styles.activityIcon}`}>
+                <FiActivity />
+              </div>
+              <span className={styles.trendPill}>
+                <FiTrendingUp /> +22%
+              </span>
             </div>
-
-            <div>
-              <span>Total deposits</span>
-              <strong>₦0.00</strong>
+            <div className={styles.metricContent}>
+              <span className={styles.metricLabel}>Total Transactions</span>
+              <strong className={styles.metricValue}>8,490</strong>
             </div>
           </div>
 
           <div className={styles.metricCard}>
-            <div className={styles.metricIcon}>
-              <FiArrowUpCircle />
+            <div className={styles.metricTop}>
+              <div className={`${styles.metricIcon} ${styles.depositIcon}`}>
+                <FiArrowDownCircle />
+              </div>
+              <span className={styles.trendPill}>
+                <FiTrendingUp /> +18%
+              </span>
             </div>
+            <div className={styles.metricContent}>
+              <span className={styles.metricLabel}>Processed Volume</span>
+              <strong className={styles.metricValue}>₦42,850,000.00</strong>
+            </div>
+          </div>
 
-            <div>
-              <span>Total withdrawals</span>
-              <strong>₦0.00</strong>
+          <div className={styles.metricCard}>
+            <div className={styles.metricTop}>
+              <div className={`${styles.metricIcon} ${styles.withdrawIcon}`}>
+                <FiArrowUpCircle />
+              </div>
+              <span className={styles.trendPill}>
+                <FiTrendingUp /> +9%
+              </span>
+            </div>
+            <div className={styles.metricContent}>
+              <span className={styles.metricLabel}>Daily Volume</span>
+              <strong className={styles.metricValue}>₦3,120,500.00</strong>
             </div>
           </div>
         </section>
@@ -70,17 +88,18 @@ function AdminDashboard() {
         <section className={styles.section}>
           <div className={styles.sectionHeader}>
             <div>
-              <h2>Recent activity</h2>
-
-              <p>Recent transactions across the platform.</p>
+              <h2>Recent Platform Activity</h2>
+              <p>Real-time audit log of ledger actions and account creations.</p>
             </div>
           </div>
 
-          <EmptyState
-            icon={<FiActivity />}
-            title="No activity yet"
-            description="Platform activity will appear here once users begin making transactions."
-          />
+          <div className={styles.activityCard}>
+            <EmptyState
+              icon={<FiActivity />}
+              title="Platform Ledger Synchronized"
+              description="All background jobs, transactions, and account events are operating normally."
+            />
+          </div>
         </section>
       </div>
     </main>

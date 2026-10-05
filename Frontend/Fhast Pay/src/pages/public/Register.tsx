@@ -1,6 +1,15 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import {
+  FiShield,
+  FiUser,
+  FiMail,
+  FiPhone,
+  FiLock,
+  FiArrowRight,
+  FiAlertCircle,
+} from "react-icons/fi";
 import { registerUser } from "../../services/authService";
 import styles from "./Register.module.css";
 
@@ -15,6 +24,11 @@ function Register() {
 
     const formData = new FormData(event.currentTarget);
     const password = String(formData.get("password") ?? "");
+    if (!/^\d{6}$/.test(password)) {
+      setError("Password must be a 6-digit number");
+      return;
+    }
+
     if (password !== String(formData.get("confirmPassword") ?? "")) {
       setError("Passwords do not match");
       return;
@@ -45,15 +59,16 @@ function Register() {
 
   return (
     <main className={styles.register}>
+      <div className={styles.ambientGlow} />
       <div className={styles.card}>
         <div className={styles.header}>
+          <div className={styles.logoBadge}>
+            <FiShield />
+          </div>
           <span className={styles.badge}>FHAST PAY</span>
-
           <h1>Create your account</h1>
-
           <p>
-            Open your Fhast Pay account and start managing your finances
-            securely.
+            Open your personal banking account and start managing your finances securely.
           </p>
         </div>
 
@@ -61,87 +76,112 @@ function Register() {
           <div className={styles.nameRow}>
             <div className={styles.formGroup}>
               <label htmlFor="firstName">First name</label>
-
-              <input
-                id="firstName"
-                type="text"
-                name="firstName"
-                placeholder="First name"
-                autoComplete="given-name"
-                required
-              />
+              <div className={styles.inputWrapper}>
+                <FiUser className={styles.inputIcon} />
+                <input
+                  id="firstName"
+                  type="text"
+                  name="firstName"
+                  placeholder="First name"
+                  autoComplete="given-name"
+                  required
+                  className={styles.input}
+                />
+              </div>
             </div>
 
             <div className={styles.formGroup}>
               <label htmlFor="lastName">Last name</label>
-
-              <input
-                id="lastName"
-                type="text"
-                name="lastName"
-                placeholder="Last name"
-                autoComplete="family-name"
-                required
-              />
+              <div className={styles.inputWrapper}>
+                <FiUser className={styles.inputIcon} />
+                <input
+                  id="lastName"
+                  type="text"
+                  name="lastName"
+                  placeholder="Last name"
+                  autoComplete="family-name"
+                  required
+                  className={styles.input}
+                />
+              </div>
             </div>
           </div>
 
           <div className={styles.formGroup}>
             <label htmlFor="email">Email address</label>
-
-            <input
-              id="email"
-              type="email"
-              name="email"
-              placeholder="Enter your email"
-              autoComplete="email"
-              required
-            />
+            <div className={styles.inputWrapper}>
+              <FiMail className={styles.inputIcon} />
+              <input
+                id="email"
+                type="email"
+                name="email"
+                placeholder="name@example.com"
+                autoComplete="email"
+                required
+                className={styles.input}
+              />
+            </div>
           </div>
 
           <div className={styles.formGroup}>
             <label htmlFor="phone">Phone number</label>
-
-            <input
-              id="phone"
-              type="tel"
-              name="phone"
-              placeholder="Enter your phone number"
-              autoComplete="tel"
-              required
-            />
+            <div className={styles.inputWrapper}>
+              <FiPhone className={styles.inputIcon} />
+              <input
+                id="phone"
+                type="tel"
+                name="phone"
+                placeholder="e.g. 08123456789"
+                autoComplete="tel"
+                required
+                className={styles.input}
+              />
+            </div>
           </div>
 
           <div className={styles.formGroup}>
-            <label htmlFor="password">Password</label>
-
-            <input
-              id="password"
-              type="password"
-              name="password"
-              placeholder="Create a password"
-              autoComplete="new-password"
-              required
-            />
+            <label htmlFor="password">6-Digit Password</label>
+            <div className={styles.inputWrapper}>
+              <FiLock className={styles.inputIcon} />
+              <input
+                id="password"
+                type="password"
+                name="password"
+                inputMode="numeric"
+                pattern="\d{6}"
+                maxLength={6}
+                placeholder="Enter 6-digit password"
+                autoComplete="new-password"
+                required
+                className={styles.input}
+              />
+            </div>
           </div>
 
           <div className={styles.formGroup}>
-            <label htmlFor="confirmPassword">Confirm password</label>
-
-            <input
-              id="confirmPassword"
-              type="password"
-              name="confirmPassword"
-              placeholder="Confirm your password"
-              autoComplete="new-password"
-              required
-            />
+            <label htmlFor="confirmPassword">Confirm Password</label>
+            <div className={styles.inputWrapper}>
+              <FiLock className={styles.inputIcon} />
+              <input
+                id="confirmPassword"
+                type="password"
+                name="confirmPassword"
+                inputMode="numeric"
+                pattern="\d{6}"
+                maxLength={6}
+                placeholder="Confirm 6-digit password"
+                autoComplete="new-password"
+                required
+                className={styles.input}
+              />
+            </div>
           </div>
 
           {error && (
-            <p className={styles.errorMessage} role="alert">
-              {error}
-            </p>
+            <div className={styles.errorMessage} role="alert">
+              <FiAlertCircle />
+              <span>{error}</span>
+            </div>
           )}
 
           <button
@@ -149,7 +189,13 @@ function Register() {
             className={styles.registerButton}
             disabled={isSubmitting}
           >
-            {isSubmitting ? "Creating account..." : "Create Account"}
+            {isSubmitting ? (
+              "Creating account..."
+            ) : (
+              <>
+                Create Account <FiArrowRight />
+              </>
+            )}
           </button>
         </form>
 
