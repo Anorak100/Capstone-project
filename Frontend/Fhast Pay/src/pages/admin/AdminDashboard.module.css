@@ -282,7 +282,27 @@
 }
 
 @media (max-width: 600px) {
+  .header h1 {
+    font-size: 1.8rem;
+  }
+
   .metrics {
     grid-template-columns: 1fr;
+  }
+
+  .metricCard {
+    padding: var(--space-4);
+  }
+
+  .activityCard {
+    padding: var(--space-5);
+  }
+
+  .activityItem {
+    align-items: flex-start;
+  }
+
+  .activityMeta {
+    align-items: flex-end;
   }
 }

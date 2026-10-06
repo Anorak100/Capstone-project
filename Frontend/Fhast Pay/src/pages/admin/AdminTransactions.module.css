@@ -282,6 +282,10 @@
 }
 
 @media (max-width: 768px) {
+  .header h1 {
+    font-size: 1.8rem;
+  }
+
   .toolbar {
     flex-direction: column;
     align-items: stretch;
@@ -289,5 +293,27 @@
 
   .searchWrapper {
     width: 100%;
+  }
+
+  .filterTabs {
+    overflow-x: auto;
+    padding-bottom: 2px;
+    scrollbar-width: none;
+  }
+
+  .filterTabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tab {
+    flex-shrink: 0;
+  }
+
+  .tableWrapper {
+    border-radius: 0;
+  }
+
+  .table {
+    min-width: 760px;
   }
 }

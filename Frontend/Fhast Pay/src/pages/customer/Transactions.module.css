@@ -335,11 +335,59 @@
     align-items: stretch;
   }
 
+  .filterTabs {
+    overflow-x: auto;
+    padding-bottom: 2px;
+    scrollbar-width: none;
+  }
+
+  .filterTabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tab {
+    flex-shrink: 0;
+  }
+
   .searchWrapper {
     width: 100%;
   }
 
   .transactionItem {
     padding: var(--space-3) var(--space-4);
+  }
+
+  .titleRow {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .metaRow {
+    flex-wrap: wrap;
+  }
+
+  .metaRow .dot,
+  .metaRow .refCode {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .transactionItem {
+    gap: var(--space-3);
+  }
+
+  .iconCircle {
+    width: 40px;
+    height: 40px;
+  }
+
+  .amountText {
+    font-size: 0.95rem;
+  }
+
+  .statusBadge {
+    display: none;
   }
 }

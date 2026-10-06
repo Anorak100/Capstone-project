@@ -5,11 +5,11 @@ import {
   FiUserCheck,
   FiArrowRight,
   FiRefreshCw,
-  FiDollarSign,
-  FiLock,
   FiShield,
   FiX,
+  FiLock,
 } from "react-icons/fi";
+import { TbCurrencyNaira } from "react-icons/tb";
 import {
   getBalance,
   lookupRecipient,
@@ -23,6 +23,7 @@ import {
   TransferApiError,
   type TransferData,
 } from "../../services/transactionService";
+
 import styles from "./Transfer.module.css";
 
 const QUICK_AMOUNTS = [1000, 2000, 5000, 10000, 20000, 50000];
@@ -202,9 +203,7 @@ function Transfer() {
         requestError.code === "INVALID_PIN"
       ) {
         setEnteredPin("");
-        setPinError(
-          requestError.message || "Invalid 4-digit transaction PIN",
-        );
+        setPinError(requestError.message || "Invalid 4-digit transaction PIN");
       } else if (showPinModal || showCreatePinModal) {
         setPinError(
           requestError instanceof Error
@@ -413,7 +412,7 @@ function Transfer() {
                 </label>
                 <div className={styles.amountInputWrapper}>
                   <span className={styles.currencyPrefix}>
-                    <FiDollarSign />
+                    <TbCurrencyNaira />
                   </span>
                   <input
                     id="amount"
@@ -599,12 +598,18 @@ function Transfer() {
             </div>
 
             <span className={styles.modalTag}>FIRST-TIME SETUP</span>
-            <h2 className={styles.modalTitle}>Create 4-Digit Transaction PIN</h2>
+            <h2 className={styles.modalTitle}>
+              Create 4-Digit Transaction PIN
+            </h2>
             <p className={styles.modalDesc}>
-              Before sending money for the first time, set up a 4-digit PIN to secure all your future transfers.
+              Before sending money for the first time, set up a 4-digit PIN to
+              secure all your future transfers.
             </p>
 
-            <form onSubmit={handleCreatePinAndTransfer} className={styles.pinForm}>
+            <form
+              onSubmit={handleCreatePinAndTransfer}
+              className={styles.pinForm}
+            >
               <div className={styles.formGroup}>
                 <label htmlFor="newPin">New 4-Digit PIN</label>
                 <input

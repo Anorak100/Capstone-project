@@ -125,8 +125,22 @@ textarea {
   font: inherit;
 }
 
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
 button {
   cursor: pointer;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid rgba(0, 71, 171, 0.28);
+  outline-offset: 2px;
 }
 
 a {
@@ -171,5 +185,37 @@ a {
     --section-gap: 2rem;
     --card-padding: 1.25rem;
     --navbar-height: 64px;
+  }
+
+  html {
+    font-size: 16px;
+  }
+
+  body {
+    overscroll-behavior-y: none;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    min-height: 44px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    width: min(calc(100% - 1.5rem), var(--container-width));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

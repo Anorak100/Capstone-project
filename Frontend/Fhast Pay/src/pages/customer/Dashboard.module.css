@@ -512,3 +512,41 @@
     max-width: 100%;
   }
 }
+
+@media (max-width: 600px) {
+  .header h1 {
+    font-size: 1.8rem;
+  }
+
+  .creditCard {
+    padding: var(--space-5);
+  }
+
+  .cardBottom {
+    align-items: flex-start;
+  }
+
+  .accountNumber {
+    font-size: 0.9rem;
+  }
+
+  .actionsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .actionCard {
+    min-height: 72px;
+  }
+
+  .sectionHeader {
+    align-items: flex-start;
+  }
+
+  .transactionRow {
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .txDescription {
+    max-width: 16rem;
+  }
+}
