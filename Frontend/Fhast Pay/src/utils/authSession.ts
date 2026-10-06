@@ -1,4 +1,5 @@
 export type StoredUser = {
+  id?: string;
   role?: string;
   fullName?: string;
   email?: string;

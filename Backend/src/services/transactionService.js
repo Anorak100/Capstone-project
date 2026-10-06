@@ -87,6 +87,9 @@ export const transfer = async ({ userId, fromAccountNumber, toAccountNumber, amo
         if (!senderAccount) {
           throw createHttpError("Sender account was not found", 404);
         }
+        if (senderAccount.status === "FROZEN") {
+          throw createHttpError("Your account is frozen and cannot send transfers", 403);
+        }
         if (senderAccount.status !== "ACTIVE") {
           throw createHttpError("Sender account is not active", 403);
         }
@@ -98,6 +101,9 @@ export const transfer = async ({ userId, fromAccountNumber, toAccountNumber, amo
 
         if (!recipientAccount) {
           throw createHttpError("Recipient account was not found", 404);
+        }
+        if (recipientAccount.status === "FROZEN") {
+          throw createHttpError("Recipient account is frozen and cannot receive transfers", 403);
         }
         if (recipientAccount.status !== "ACTIVE") {
           throw createHttpError("Recipient account is not active", 403);

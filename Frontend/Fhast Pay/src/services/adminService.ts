@@ -19,14 +19,20 @@ const getErrorMessage = (result: {
   return result.message || "The request could not be completed";
 };
 
+type AdminFetchOptions = {
+  method?: "GET" | "PATCH" | "POST";
+  query?: Record<string, string | number | undefined>;
+  body?: unknown;
+};
+
 const adminFetch = async <T>(
   token: string,
   path: string,
-  query?: Record<string, string | number | undefined>,
+  options: AdminFetchOptions = {},
 ): Promise<T> => {
   const params = new URLSearchParams();
-  if (query) {
-    for (const [key, value] of Object.entries(query)) {
+  if (options.query) {
+    for (const [key, value] of Object.entries(options.query)) {
       if (value !== undefined && value !== "") {
         params.set(key, String(value));
       }
@@ -36,10 +42,12 @@ const adminFetch = async <T>(
   const response = await fetch(
     `${API_URL}/admin${path}${qs ? `?${qs}` : ""}`,
     {
+      method: options.method ?? "GET",
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
+      body: options.body !== undefined ? JSON.stringify(options.body) : undefined,
     },
   );
 
@@ -123,7 +131,7 @@ export const getAdminMetrics = (token: string) =>
 export const getAdminUsers = (
   token: string,
   query: { page?: number; limit?: number; search?: string } = {},
-) => adminFetch<AdminUserList>(token, "/users", query);
+) => adminFetch<AdminUserList>(token, "/users", { query });
 
 export const getAdminTransactions = (
   token: string,
@@ -133,7 +141,24 @@ export const getAdminTransactions = (
     type?: "DEPOSIT" | "WITHDRAWAL" | "TRANSFER";
     search?: string;
   } = {},
-) => adminFetch<AdminTransactionList>(token, "/transactions", query);
+) => adminFetch<AdminTransactionList>(token, "/transactions", { query });
+
+export type UpdateUserStatusResult = {
+  user: AdminUser;
+  previousIsActive: boolean;
+  isActive: boolean;
+  accountsUpdated: number;
+};
+
+export const updateAdminUserStatus = (
+  token: string,
+  userId: string,
+  isActive: boolean,
+) =>
+  adminFetch<UpdateUserStatusResult>(token, `/users/${userId}/status`, {
+    method: "PATCH",
+    body: { isActive },
+  });
 
 export const formatAdminMoney = (
   amount: string | number,

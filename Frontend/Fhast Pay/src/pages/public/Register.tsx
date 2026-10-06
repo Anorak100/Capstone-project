@@ -11,7 +11,6 @@ import {
   FiAlertCircle,
   FiGift,
   FiX,
-  FiCheckCircle,
 } from "react-icons/fi";
 import { registerUser } from "../../services/authService";
 import styles from "./Register.module.css";
