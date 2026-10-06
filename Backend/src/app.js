@@ -10,7 +10,24 @@ import errorMiddleware from "./Middleware/errorMiddleware.js";
 const app = express();
 
 app.use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev"));
-app.use(cors({ origin: true, credentials: true }));
+const allowedOrigins = new Set([
+  "https://fhast-pay.vercel.app",
+  "http://localhost:5173",
+  "http://127.0.0.1:5173",
+  ...(process.env.FRONTEND_URL ?? "")
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean),
+]);
+
+app.use(
+  cors({
+    origin(origin, callback) {
+      return callback(null, !origin || allowedOrigins.has(origin));
+    },
+    credentials: true,
+  }),
+);
 app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: true }));
 
