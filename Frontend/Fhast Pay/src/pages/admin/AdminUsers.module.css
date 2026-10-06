@@ -349,6 +349,10 @@
 }
 
 @media (max-width: 768px) {
+  .header h1 {
+    font-size: 1.8rem;
+  }
+
   .toolbar {
     flex-direction: column;
     align-items: stretch;
@@ -356,5 +360,13 @@
 
   .searchWrapper {
     width: 100%;
+  }
+
+  .tableWrapper {
+    border-radius: 0;
+  }
+
+  .table {
+    min-width: 720px;
   }
 }

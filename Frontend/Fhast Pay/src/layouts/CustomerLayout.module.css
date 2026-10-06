@@ -154,29 +154,46 @@
   .sidebar {
     width: 100%;
     height: auto;
-    position: static;
-    padding: var(--space-4);
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    padding: var(--space-3) var(--space-4);
     border-right: none;
     border-bottom: 1px solid var(--color-border);
+    box-shadow: 0 2px 12px rgba(15, 23, 42, 0.06);
   }
 
   .brand {
-    margin-bottom: var(--space-3);
-    padding-bottom: var(--space-3);
+    margin-bottom: var(--space-2);
+    padding: 0 0 var(--space-2);
+  }
+
+  .brandIcon {
+    width: 34px;
+    height: 34px;
+  }
+
+  .brandTag {
+    display: none;
   }
 
   .navigation {
     flex-direction: row;
     overflow-x: auto;
-    padding-bottom: var(--space-1);
+    padding-bottom: 2px;
     gap: var(--space-1);
+    scrollbar-width: none;
+  }
+
+  .navigation::-webkit-scrollbar {
+    display: none;
   }
 
   .navItem {
     flex-shrink: 0;
-    min-height: 38px;
+    min-height: 42px;
     padding: 0 var(--space-3);
-    font-size: 0.85rem;
+    font-size: 0.8rem;
   }
 
   .sidebarFooter {
@@ -184,6 +201,6 @@
   }
 
   .main {
-    padding: var(--space-4);
+    padding: var(--space-4) var(--space-3) var(--space-8);
   }
 }

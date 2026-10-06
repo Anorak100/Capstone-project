@@ -568,16 +568,43 @@
   }
 
   .heroCard {
+    align-items: flex-start;
     flex-direction: column;
-    text-align: center;
+    padding: var(--space-5);
+    text-align: left;
+  }
+
+  .avatar {
+    width: 52px;
+    height: 52px;
+    font-size: 1.25rem;
   }
 
   .nameRow {
-    justify-content: center;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .sectionCard {
+    padding: var(--space-5);
   }
 
   .secActionCol {
     flex-direction: column;
-    align-items: flex-end;
+    align-items: flex-start;
+  }
+
+  .pinActionBtn {
+    min-height: 42px;
+  }
+
+  .logoutWrapper {
+    justify-content: stretch;
+  }
+
+  .logoutButton {
+    width: 100%;
+    justify-content: center;
   }
 }

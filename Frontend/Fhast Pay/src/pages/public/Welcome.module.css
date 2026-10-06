@@ -555,24 +555,62 @@
 }
 
 @media (max-width: 600px) {
+  .navContainer {
+    height: 62px;
+  }
+
+  .hero {
+    padding-block: var(--space-8) var(--space-6);
+  }
+
+  .heroContainer {
+    gap: var(--space-8);
+  }
+
   .heroTitle {
-    font-size: 2.25rem;
+    font-size: clamp(2rem, 10vw, 2.75rem);
+  }
+
+  .heroSubtitle {
+    font-size: 1rem;
+    line-height: 1.6;
   }
 
   .heroActions {
     flex-direction: column;
     width: 100%;
-    gap: var(--space-8);
+    gap: var(--space-3);
+  }
+
+  .primaryBtn,
+  .secondaryBtn {
+    width: 100%;
+    min-height: 48px;
+    justify-content: center;
+  }
+
+  .trustBadges {
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .cardMockup {
+    max-width: 360px;
+    padding: var(--space-5);
+  }
+
+  .features {
+    padding-block: var(--space-8);
+  }
+
+  .featureCard {
+    padding: var(--space-5);
   }
 
   .logo span,
   .registerLink {
     display: none;
-  }
-  .primaryBtn,
-  .secondaryBtn {
-    width: 100%;
-    justify-content: center;
   }
 
   .floatingPill {
