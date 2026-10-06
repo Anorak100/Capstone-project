@@ -1,3 +1,4 @@
+import bcrypt from "bcryptjs";
 import prisma from "../Config/prisma.js";
 import generateReference from "../utils/generateReference.js";
 
@@ -28,7 +29,7 @@ const parseAmount = (amount) => {
 const isRetryableTransactionError = (error) =>
   error.code === "P2034" || error.code === "P2002";
 
-export const transfer = async ({ userId, fromAccountNumber, toAccountNumber, amount, description }) => {
+export const transfer = async ({ userId, fromAccountNumber, toAccountNumber, amount, description, pin }) => {
   if (typeof userId !== "string" || !userId) {
     throw createHttpError("Authentication is required", 401);
   }
@@ -50,6 +51,34 @@ export const transfer = async ({ userId, fromAccountNumber, toAccountNumber, amo
 
     try {
       return await prisma.$transaction(async (tx) => {
+        const user = await tx.user.findUnique({
+          where: { id: userId },
+          select: { id: true, transactionPin: true, isActive: true },
+        });
+
+        if (!user || !user.isActive) {
+          throw createHttpError("Sender account is not active", 403);
+        }
+
+        if (!user.transactionPin) {
+          const pinError = createHttpError("Please set up your 4-digit transaction PIN before transferring", 428);
+          pinError.code = "PIN_NOT_SET";
+          throw pinError;
+        }
+
+        if (!pin || typeof pin !== "string" || !/^\d{4}$/.test(pin.trim())) {
+          const pinError = createHttpError("Enter your 4-digit transaction PIN", 400);
+          pinError.code = "PIN_REQUIRED";
+          throw pinError;
+        }
+
+        const isPinValid = await bcrypt.compare(pin.trim(), user.transactionPin);
+        if (!isPinValid) {
+          const pinError = createHttpError("Invalid 4-digit transaction PIN", 401);
+          pinError.code = "INVALID_PIN";
+          throw pinError;
+        }
+
         const senderAccount = await tx.account.findFirst({
           where: { accountNumber: fromAccountNumber.trim(), userId },
           select: { id: true, userId: true, accountNumber: true, currency: true, status: true }
@@ -57,6 +86,9 @@ export const transfer = async ({ userId, fromAccountNumber, toAccountNumber, amo
 
         if (!senderAccount) {
           throw createHttpError("Sender account was not found", 404);
+        }
+        if (senderAccount.status === "FROZEN") {
+          throw createHttpError("Your account is frozen and cannot send transfers", 403);
         }
         if (senderAccount.status !== "ACTIVE") {
           throw createHttpError("Sender account is not active", 403);
@@ -69,6 +101,9 @@ export const transfer = async ({ userId, fromAccountNumber, toAccountNumber, amo
 
         if (!recipientAccount) {
           throw createHttpError("Recipient account was not found", 404);
+        }
+        if (recipientAccount.status === "FROZEN") {
+          throw createHttpError("Recipient account is frozen and cannot receive transfers", 403);
         }
         if (recipientAccount.status !== "ACTIVE") {
           throw createHttpError("Recipient account is not active", 403);

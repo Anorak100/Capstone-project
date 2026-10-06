@@ -1,48 +1,62 @@
 :root {
   /* BRAND COLORS */
-  --color-primary: #003566;
-  --color-primary-dark: #001d3d;
-  --color-primary-light: #e8f1f8;
+  --color-primary: #0047ab;
+  --color-primary-dark: #002d6b;
+  --color-primary-light: #eef4ff;
+  --color-primary-subtle: #f4f8ff;
+  --color-accent: #00d4b2;
+  --color-accent-subtle: #e6faf7;
+
+  /* GRADIENTS */
+  --gradient-primary: linear-gradient(135deg, #003e96 0%, #0056cc 100%);
+  --gradient-card: linear-gradient(135deg, #081d38 0%, #003e96 60%, #1255b8 100%);
+  --gradient-surface: linear-gradient(180deg, #ffffff 0%, #f9fbff 100%);
+  --gradient-glow: radial-gradient(circle at 50% 0%, rgba(0, 71, 171, 0.08) 0%, transparent 70%);
 
   /* BACKGROUNDS */
   --color-background: #f8fafc;
   --color-surface: #ffffff;
+  --color-surface-hover: #f1f5f9;
 
   /* TEXT */
-  --color-text: #171717;
-  --color-text-muted: #525252;
-  --color-text-light: #737373;
+  --color-text: #0f172a;
+  --color-text-muted: #475569;
+  --color-text-light: #94a3b8;
 
   /* BORDER */
   --color-border: #e2e8f0;
+  --color-border-subtle: #edf2f7;
 
   /* STATUS */
-  --color-success: #15803d;
+  --color-success: #16a34a;
   --color-success-bg: #f0fdf4;
+  --color-success-border: #bbf7d0;
 
   --color-danger: #dc2626;
   --color-danger-bg: #fef2f2;
+  --color-danger-border: #fecaca;
 
   --color-warning: #d97706;
   --color-warning-bg: #fffbeb;
+  --color-warning-border: #fde68a;
 
   /* TYPOGRAPHY */
-  --font-family: "Inter", sans-serif;
+  --font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 
   /* SPACING */
-  --space-1: 0.5rem; /* 4px */
-  --space-2: 0.25rem; /* 8px */
+  --space-1: 0.25rem; /* 4px */
+  --space-2: 0.5rem;  /* 8px */
   --space-3: 0.75rem; /* 12px */
-  --space-4: 1rem; /* 16px */
+  --space-4: 1rem;    /* 16px */
   --space-5: 1.25rem; /* 20px */
-  --space-6: 1.5rem; /* 24px */
-  --space-8: 2rem; /* 32px */
+  --space-6: 1.5rem;  /* 24px */
+  --space-8: 2rem;    /* 32px */
   --space-10: 2.5rem; /* 40px */
-  --space-12: 3rem; /* 48px */
+  --space-12: 3rem;   /* 48px */
 
   /* LAYOUT */
   --container-width: 1200px;
-  --content-width: 720px;
+  --content-width: 760px;
   --navbar-height: 72px;
 
   /* SCREEN / SECTION */
@@ -50,24 +64,28 @@
   --section-gap: 3rem;
 
   /* COMPONENT SPACING */
-  --card-padding: 1.5rem;
-  --card-gap: 1rem;
-  --form-gap: 1.2rem;
-  --button-padding: 0.75rem 1.25rem;
+  --card-padding: 1.75rem;
+  --card-gap: 1.25rem;
+  --form-gap: 1.25rem;
+  --button-padding: 0.75rem 1.5rem;
 
   /* BORDER RADIUS */
-  --radius-sm: 5px;
-  --radius-md: 10px;
-  --radius-lg: 15px;
-  --radius-full: 999px;
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
 
   /* SHADOWS */
-  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
-  --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
+  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05), 0 1px 2px rgba(15, 23, 42, 0.03);
+  --shadow-md: 0 4px 14px -2px rgba(15, 23, 42, 0.07), 0 2px 6px -2px rgba(15, 23, 42, 0.04);
+  --shadow-lg: 0 12px 28px -4px rgba(15, 23, 42, 0.09), 0 4px 12px -2px rgba(15, 23, 42, 0.04);
+  --shadow-card: 0 16px 36px -6px rgba(0, 45, 107, 0.25);
+  --shadow-glow: 0 0 20px rgba(0, 71, 171, 0.18);
 
   /* TRANSITIONS */
-  --transition-fast: 0.2s ease;
-  --transition-normal: 0.3s ease;
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 
   /* DEFAULTS */
   font-family: var(--font-family);
@@ -83,7 +101,6 @@
 }
 
 /* CSS RESET */
-
 * {
   box-sizing: border-box;
 }
@@ -96,9 +113,9 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-
   background: var(--color-background);
   color: var(--color-text);
+  font-family: var(--font-family);
 }
 
 button,
@@ -122,20 +139,32 @@ a {
 }
 
 /* CONTAINER */
-
 .container {
   width: min(calc(100% - (2 * var(--page-padding))), var(--container-width));
   margin-inline: auto;
 }
 
-/* SECTION */
-
 .section {
   padding-block: var(--section-gap);
 }
 
-/* MOBILE SCREEN */
+/* SCROLLBAR */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
 
+/* MOBILE SCREEN */
 @media (max-width: 768px) {
   :root {
     --page-padding: 1rem;

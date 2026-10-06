@@ -1,16 +1,36 @@
-import { FiShield, FiBell, FiLock } from "react-icons/fi";
+import { useState } from "react";
+import { FiShield, FiBell, FiLock, FiCheck } from "react-icons/fi";
+import Toast from "../../components/common/Toast";
 import styles from "./AdminSettings.module.css";
 
 function AdminSettings() {
+  const [securityEnabled, setSecurityEnabled] = useState(true);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [passwordPolicy, setPasswordPolicy] = useState(true);
+  const [toast, setToast] = useState<string | null>(null);
+
+  const handleToggle = (setting: string, setter: React.Dispatch<React.SetStateAction<boolean>>) => {
+    setter((prev) => {
+      const next = !prev;
+      setToast(`${setting} has been ${next ? "enabled" : "disabled"}.`);
+      return next;
+    });
+  };
+
   return (
     <main className={styles.settings}>
+      {toast && (
+        <Toast
+          message={toast}
+          type="info"
+          onClose={() => setToast(null)}
+        />
+      )}
       <div className={styles.container}>
         <header className={styles.header}>
-          <p className={styles.eyebrow}>Administration</p>
-
-          <h1>Settings</h1>
-
-          <p>Manage administrative preferences for Fhast Pay.</p>
+          <div className={styles.headerTag}>System Configuration</div>
+          <h1>Platform Settings</h1>
+          <p>Configure security parameters, audit alerts, and authentication policies for Fhast Pay.</p>
         </header>
 
         <section className={styles.card}>
@@ -20,14 +40,22 @@ function AdminSettings() {
             </div>
 
             <div className={styles.content}>
-              <h2>Admin security</h2>
-
+              <h2>Multi-Admin Authorization</h2>
               <p>
-                Manage security and access controls for the administration area.
+                Require secondary administrative approval for high-value flagged transactions above ₦1,000,000.
               </p>
             </div>
 
-            <span className={styles.status}>Enabled</span>
+            <button
+              type="button"
+              className={`${styles.toggle} ${securityEnabled ? styles.toggleActive : ""}`}
+              onClick={() => handleToggle("Multi-Admin Authorization", setSecurityEnabled)}
+              aria-label="Toggle Multi-Admin Authorization"
+            >
+              <span className={styles.toggleKnob}>
+                {securityEnabled && <FiCheck className={styles.checkIcon} />}
+              </span>
+            </button>
           </div>
 
           <div className={styles.setting}>
@@ -36,15 +64,22 @@ function AdminSettings() {
             </div>
 
             <div className={styles.content}>
-              <h2>Notifications</h2>
-
+              <h2>High-Volume Activity Alerts</h2>
               <p>
-                Configure notifications for important account and transaction
-                activity.
+                Send real-time alerts to the administrative security team on sudden transaction velocity spikes.
               </p>
             </div>
 
-            <span className={styles.status}>Enabled</span>
+            <button
+              type="button"
+              className={`${styles.toggle} ${notificationsEnabled ? styles.toggleActive : ""}`}
+              onClick={() => handleToggle("High-Volume Alerts", setNotificationsEnabled)}
+              aria-label="Toggle High-Volume Alerts"
+            >
+              <span className={styles.toggleKnob}>
+                {notificationsEnabled && <FiCheck className={styles.checkIcon} />}
+              </span>
+            </button>
           </div>
 
           <div className={styles.setting}>
@@ -53,12 +88,22 @@ function AdminSettings() {
             </div>
 
             <div className={styles.content}>
-              <h2>Password security</h2>
-
-              <p>Review password and authentication requirements.</p>
+              <h2>6-Digit PIN Validation Strictness</h2>
+              <p>
+                Reject consecutive and repeated patterns (e.g. 111111, 123456) during user registration.
+              </p>
             </div>
 
-            <span className={styles.status}>Enabled</span>
+            <button
+              type="button"
+              className={`${styles.toggle} ${passwordPolicy ? styles.toggleActive : ""}`}
+              onClick={() => handleToggle("Strict PIN Policy", setPasswordPolicy)}
+              aria-label="Toggle PIN Policy"
+            >
+              <span className={styles.toggleKnob}>
+                {passwordPolicy && <FiCheck className={styles.checkIcon} />}
+              </span>
+            </button>
           </div>
         </section>
       </div>

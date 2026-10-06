@@ -10,7 +10,8 @@ export const makeTransfer = async (req, res, next) => {
       fromAccountNumber: req.body.fromAccount,
       toAccountNumber: req.body.toAccount,
       amount: req.body.amount,
-      description: req.body.description
+      description: req.body.description,
+      pin: req.body.pin,
     });
 
     res.status(200).json({

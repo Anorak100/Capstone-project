@@ -16,6 +16,7 @@ export const adminTransactionListSchema = z.object({
   status: z.enum(["SUCCESSFUL", "FAILED", "PENDING"]).optional(),
   userId: z.string().uuid().optional(),
   reference: z.string().trim().max(100).optional(),
+  search: z.string().trim().max(100).optional(),
   from: z.coerce.date().optional(),
   to: z.coerce.date().optional(),
 }).refine(({ from, to }) => !from || !to || from <= to, {

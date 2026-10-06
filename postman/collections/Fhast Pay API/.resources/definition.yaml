@@ -1,6 +1,0 @@
-$kind: collection
-name: Fhast Pay API
-variables:
-  - key: baseUrl
-    value: 'http://localhost:5000'
-    type: default

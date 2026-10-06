@@ -5,64 +5,145 @@
 }
 
 .sidebar {
-  width: 240px;
+  width: 260px;
   flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
   padding: var(--space-6) var(--space-4);
   background: var(--color-surface);
   border-right: 1px solid var(--color-border);
+  position: sticky;
+  top: 0;
+  height: 100vh;
 }
 
-.logo {
-  margin-bottom: var(--space-8);
-  padding-inline: var(--space-3);
-  color: var(--color-text);
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3) var(--space-6);
+  margin-bottom: var(--space-4);
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.brandIcon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--gradient-primary);
+  color: #ffffff;
+  border-radius: var(--radius-md);
   font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--color-primary);
+  box-shadow: 0 4px 10px rgba(0, 71, 171, 0.25);
+}
+
+.brandText {
+  display: flex;
+  flex-direction: column;
+}
+
+.brandName {
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: var(--color-primary-dark);
+}
+
+.brandTag {
+  font-size: 0.72rem;
+  color: var(--color-text-light);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .navigation {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
+  flex: 1;
 }
 
-.navigation a {
+.navItem {
   display: flex;
   align-items: center;
   gap: var(--space-3);
   min-height: 44px;
-  padding: 0 var(--space-3);
+  padding: 0 var(--space-4);
   color: var(--color-text-muted);
   border-radius: var(--radius-md);
-  font-size: 0.9rem;
+  font-size: 0.925rem;
   font-weight: 600;
   text-decoration: none;
-
-  transition:
-    background-color var(--transition-fast),
-    color var(--transition-fast);
+  transition: all var(--transition-fast);
+  border: 1px solid transparent;
 }
 
-.navigation a svg {
-  font-size: 1.1rem;
-  color: var(--color-primary);
+.navIcon {
+  font-size: 1.15rem;
+  color: var(--color-text-light);
+  transition: color var(--transition-fast);
 }
 
-.navigation a:hover {
+.navItem:hover {
   background: var(--color-primary-light);
   color: var(--color-primary);
 }
 
-.navigation a:focus {
+.navItem:hover .navIcon {
+  color: var(--color-primary);
+}
+
+.navItem.active {
   background: var(--color-primary-light);
   color: var(--color-primary);
+  font-weight: 700;
+  border-color: rgba(0, 71, 171, 0.15);
+  box-shadow: 0 2px 8px rgba(0, 71, 171, 0.08);
+}
+
+.navItem.active .navIcon {
+  color: var(--color-primary);
+}
+
+.sidebarFooter {
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border-subtle);
+}
+
+.logoutButton {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 44px;
+  padding: 0 var(--space-4);
+  background: transparent;
+  color: var(--color-danger);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  font-size: 0.925rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.logoutButton:hover {
+  background: var(--color-danger-bg);
+  border-color: var(--color-danger-border);
+}
+
+.logoutButton .navIcon {
+  color: var(--color-danger);
 }
 
 .main {
   flex: 1;
   min-width: 0;
-  padding: var(--space-6);
+  padding: var(--space-8);
+  overflow-y: auto;
 }
 
 @media (max-width: 768px) {
@@ -72,23 +153,34 @@
 
   .sidebar {
     width: 100%;
+    height: auto;
+    position: static;
     padding: var(--space-4);
     border-right: none;
     border-bottom: 1px solid var(--color-border);
   }
 
-  .logo {
-    margin-bottom: var(--space-4);
+  .brand {
+    margin-bottom: var(--space-3);
+    padding-bottom: var(--space-3);
   }
 
   .navigation {
     flex-direction: row;
     overflow-x: auto;
     padding-bottom: var(--space-1);
+    gap: var(--space-1);
   }
 
-  .navigation a {
+  .navItem {
     flex-shrink: 0;
+    min-height: 38px;
+    padding: 0 var(--space-3);
+    font-size: 0.85rem;
+  }
+
+  .sidebarFooter {
+    display: none;
   }
 
   .main {

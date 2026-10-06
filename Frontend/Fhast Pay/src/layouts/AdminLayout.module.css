@@ -1,102 +1,145 @@
 .layout {
   min-height: 100vh;
-
   display: flex;
-
   background: var(--color-background);
 }
 
-/* SIDEBAR */
-
 .sidebar {
-  width: 240px;
-
+  width: 260px;
   flex-shrink: 0;
-
-  padding: var(--space-6) var(--space-4);
-
-  background: var(--color-surface);
-
-  border-right: 1px solid var(--color-border);
-}
-
-.logo {
   display: flex;
   flex-direction: column;
+  padding: var(--space-6) var(--space-4);
+  background: #0f172a;
+  color: #f8fafc;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
 
-  margin-bottom: var(--space-8);
-  padding-inline: var(--space-3);
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3) var(--space-6);
+  margin-bottom: var(--space-4);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
 
-  color: var(--color-text);
-
+.brandIcon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #00d4b2 0%, #0077b6 100%);
+  color: #ffffff;
+  border-radius: var(--radius-md);
   font-size: 1.25rem;
-  font-weight: 700;
+  box-shadow: 0 4px 10px rgba(0, 212, 178, 0.25);
 }
 
-.logo span {
-  color: var(--color-primary);
+.brandText {
+  display: flex;
+  flex-direction: column;
 }
 
-.logo small {
-  margin-top: var(--space-1);
+.brandName {
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: #ffffff;
+}
 
-  color: var(--color-text-muted);
-
+.adminBadge {
   font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
+  color: #00d4b2;
+  font-weight: 700;
   text-transform: uppercase;
+  letter-spacing: 0.08em;
 }
 
 .navigation {
   display: flex;
   flex-direction: column;
-
   gap: var(--space-2);
+  flex: 1;
 }
 
-.navigation a {
+.navItem {
   display: flex;
   align-items: center;
-
   gap: var(--space-3);
-
   min-height: 44px;
-
-  padding: 0 var(--space-3);
-
-  color: var(--color-text-muted);
-
+  padding: 0 var(--space-4);
+  color: #94a3b8;
   border-radius: var(--radius-md);
+  font-size: 0.925rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all var(--transition-fast);
+  border: 1px solid transparent;
+}
 
+.navIcon {
+  font-size: 1.15rem;
+  color: #64748b;
+  transition: color var(--transition-fast);
+}
+
+.navItem:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+}
+
+.navItem:hover .navIcon {
+  color: #00d4b2;
+}
+
+.navItem.active {
+  background: rgba(0, 212, 178, 0.12);
+  color: #00d4b2;
+  font-weight: 700;
+  border-color: rgba(0, 212, 178, 0.25);
+}
+
+.navItem.active .navIcon {
+  color: #00d4b2;
+}
+
+.sidebarFooter {
+  padding-top: var(--space-4);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.exitButton {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 44px;
+  padding: 0 var(--space-4);
+  background: transparent;
+  color: #94a3b8;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
   font-size: 0.9rem;
   font-weight: 600;
-
-  text-decoration: none;
-
-  transition:
-    background-color var(--transition-fast),
-    color var(--transition-fast);
+  cursor: pointer;
+  transition: all var(--transition-fast);
 }
 
-.navigation a svg {
-  font-size: 1.1rem;
-  color: var(--color-primary);
-}
-
-.navigation a:hover,
-.navigation a:focus {
-  background: var(--color-primary-light);
-  color: var(--color-primary);
+.exitButton:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
 }
 
 .main {
   flex: 1;
   min-width: 0;
-  padding: var(--space-6);
+  padding: var(--space-8);
+  overflow-y: auto;
 }
-
-/* MOBILE */
 
 @media (max-width: 768px) {
   .layout {
@@ -105,27 +148,27 @@
 
   .sidebar {
     width: 100%;
-
+    height: auto;
+    position: static;
     padding: var(--space-4);
-
-    border-right: none;
-    border-bottom: 1px solid var(--color-border);
   }
 
-  .logo {
-    margin-bottom: var(--space-4);
+  .brand {
+    margin-bottom: var(--space-3);
+    padding-bottom: var(--space-3);
   }
 
   .navigation {
     flex-direction: row;
-
     overflow-x: auto;
-
-    padding-bottom: var(--space-1);
   }
 
-  .navigation a {
+  .navItem {
     flex-shrink: 0;
+  }
+
+  .sidebarFooter {
+    display: none;
   }
 
   .main {
