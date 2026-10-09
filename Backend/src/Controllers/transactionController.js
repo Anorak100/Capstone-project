@@ -1,48 +1,7 @@
 import {
-  deposit,
-  withdraw,
   transfer,
-  getUserTransactions,
-  getTransactionById
+  getUserTransactions
 } from "../services/transactionService.js";
-
-export const makeDeposit = async (req, res, next) => {
-  try {
-    const result = await deposit({
-      userId: req.user.userId,
-      accountNumber: req.body.accountNumber,
-      amount: req.body.amount,
-      description: req.body.description
-    });
-
-    res.status(200).json({
-      success: true,
-      message: "Deposit successful",
-      data: result
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const makeWithdrawal = async (req, res, next) => {
-  try {
-    const result = await withdraw({
-      userId: req.user.userId,
-      accountNumber: req.body.accountNumber,
-      amount: req.body.amount,
-      description: req.body.description
-    });
-
-    res.status(200).json({
-      success: true,
-      message: "Withdrawal successful",
-      data: result
-    });
-  } catch (error) {
-    next(error);
-  }
-};
 
 export const makeTransfer = async (req, res, next) => {
   try {
@@ -66,8 +25,8 @@ export const makeTransfer = async (req, res, next) => {
 
 export const getTransactions = async (req, res, next) => {
   try {
-    const page = Math.max(parseInt(req.query.page) || 1, 1);
-    const limit = Math.min(parseInt(req.query.limit) || 10, 100);
+    const page = Number.parseInt(req.query.page, 10) || 1;
+    const limit = Number.parseInt(req.query.limit, 10) || 10;
 
     const result = await getUserTransactions({
       userId: req.user.userId,
@@ -88,29 +47,7 @@ export const getTransactions = async (req, res, next) => {
   }
 };
 
-export const getTransaction = async (req, res, next) => {
-  try {
-    const transaction = await getTransactionById(
-      req.params.id,
-      req.user.userId
-    );
-
-    res.status(200).json({
-      success: true,
-      message: "Transaction retrieved successfully",
-      data: {
-        transaction
-      }
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
 export default {
-  makeDeposit,
-  makeWithdrawal,
   makeTransfer,
-  getTransactions,
-  getTransaction
+  getTransactions
 };

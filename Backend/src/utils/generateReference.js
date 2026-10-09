@@ -1,9 +1,5 @@
-const generateReference = () => {
-  const timestamp = Date.now();
+import { randomUUID } from "node:crypto";
 
-  const random = Math.floor(1000 + Math.random() * 9000);
-
-  return `TXN-${timestamp}-${random}`;
-};
+const generateReference = () => `TXN-${randomUUID()}`;
 
 export default generateReference;
